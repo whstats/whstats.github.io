@@ -1,84 +1,240 @@
 <!DOCTYPE html>
 <html lang="zh">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>个人网站</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --main-bg-color: rgb(246, 244, 240);
-    }
+    <meta charset="UTF-8">
+    <title>个人主页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: 'Noto Sans SC', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: var(--main-bg-color);
-    }
-  </style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background-color: #4a90e2;
+            border-radius: 50%;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            position: relative;
+        }
+
+        .tab.active {
+            color: #4a90e2;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #4a90e2;
+        }
+
+        main {
+            padding: 40px;
+            display: none;
+        }
+
+        main.active {
+            display: block;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .card-description {
+            color: #666;
+            line-height: 1.5;
+        }
+    </style>
 </head>
-
 <body>
-  <nav class="navbar">
-    <div class="logo">Your Logo</div>
-    <div class="nav-links">
-      <button class="active" data-tab="membership">Membership</button>
-      <button data-tab="newsletter">Newsletter</button>
-      <button data-tab="projects">Projects</button>
-      <button data-tab="learning">Learning</button>
-      <button data-tab="about">About</button>
-    </div>
-  </nav>
+    <header>
+        <div class="logo-container">
+            <div class="logo"></div>
+            <div class="title">我的主页</div>
+        </div>
+        <nav>
+            <button class="tab active" data-tab="visualization">可视化</button>
+            <button class="tab" data-tab="projects">项目</button>
+            <button class="tab" data-tab="about">关于</button>
+        </nav>
+    </header>
 
-  <main class="main-content">
-    <div class="posts-container">
-      <!-- 左列文章 -->
-      <div class="posts-column">
-        <article class="post">
-          <img src="/api/placeholder/600/400" alt="创建数据可视化" class="post-image">
-          <h2 class="post-title">创建数据可视化</h2>
-          <p class="post-description">学习如何使用现代工具创建有效的数据可视化。</p>
-        </article>
-        <article class="post">
-          <img src="/api/placeholder/600/400" alt="Web 开发最佳实践" class="post-image">
-          <h2 class="post-title">Web 开发最佳实践</h2>
-          <p class="post-description">现代网页开发技术的综合指南。</p>
-        </article>
-      </div>
+    <main id="visualization" class="active">
+        <div class="content-grid">
+            <div class="card">
+                <img src="/api/placeholder/400/200" alt="可视化项目1">
+                <div class="card-content">
+                    <h3 class="card-title">数据可视化展示</h3>
+                    <p class="card-description">基于D3.js的交互式数据可视化项目，展示复杂数据关系。</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="/api/placeholder/400/200" alt="可视化项目2">
+                <div class="card-content">
+                    <h3 class="card-title">实时数据监控</h3>
+                    <p class="card-description">使用ECharts实现的实时数据监控系统。</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="/api/placeholder/400/200" alt="可视化项目3">
+                <div class="card-content">
+                    <h3 class="card-title">地理信息可视化</h3>
+                    <p class="card-description">基于地理数据的信息可视化展示系统。</p>
+                </div>
+            </div>
+        </div>
+    </main>
 
-      <!-- 右列文章 -->
-      <div class="posts-column">
-        <article class="post">
-          <img src="/api/placeholder/600/400" alt="用户体验设计" class="post-image">
-          <h2 class="post-title">用户体验设计</h2>
-          <p class="post-description">探索创建优秀用户体验的关键原则。</p>
-        </article>
-        <article class="post">
-          <img src="/api/placeholder/600/400" alt="移动端开发指南" class="post-image">
-          <h2 class="post-title">移动端开发指南</h2>
-          <p class="post-description">学习响应式设计和移动端开发技巧。</p>
-        </article>
-      </div>
-    </div>
-  </main>
+    <main id="projects">
+        <div class="content-grid">
+            <div class="card">
+                <img src="/api/placeholder/400/200" alt="项目1">
+                <div class="card-content">
+                    <h3 class="card-title">Web应用开发</h3>
+                    <p class="card-description">使用React开发的现代化Web应用。</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="/api/placeholder/400/200" alt="项目2">
+                <div class="card-content">
+                    <h3 class="card-title">移动端开发</h3>
+                    <p class="card-description">基于Flutter的跨平台移动应用。</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="/api/placeholder/400/200" alt="项目3">
+                <div class="card-content">
+                    <h3 class="card-title">后端系统</h3>
+                    <p class="card-description">使用Node.js构建的高性能后端系统。</p>
+                </div>
+            </div>
+        </div>
+    </main>
 
-  <footer class="footer">
-    <div class="footer-links">
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
-      <a href="#newsletter">Newsletter</a>
-      <a href="#linkedin">LinkedIn</a>
-      <a href="#instagram">Instagram</a>
-      <a href="#bluesky">Bluesky</a>
-      <a href="#rss">RSS</a>
-    </div>
-    <div class="footer-copyright">
-      Copyright © 2007-Present Your Name. All rights reserved.
-    </div>
-  </footer>
+    <main id="about">
+        <div class="content-grid">
+            <div class="card">
+                <img src="/api/placeholder/400/200" alt="个人简介">
+                <div class="card-content">
+                    <h3 class="card-title">关于我</h3>
+                    <p class="card-description">全栈开发工程师，热爱技术创新。</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="/api/placeholder/400/200" alt="技能">
+                <div class="card-content">
+                    <h3 class="card-title">技能专长</h3>
+                    <p class="card-description">前端开发、数据可视化、后端开发。</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="/api/placeholder/400/200" alt="联系方式">
+                <div class="card-content">
+                    <h3 class="card-title">联系方式</h3>
+                    <p class="card-description">邮箱、社交媒体等联系方式。</p>
+                </div>
+            </div>
+        </div>
+    </main>
 
+    <script>
+        const tabs = document.querySelectorAll('.tab');
+        const mains = document.querySelectorAll('main');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // 更新标签页状态
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // 更新内容区域
+                mains.forEach(main => {
+                    if (main.id === tabId) {
+                        main.classList.add('active');
+                    } else {
+                        main.classList.remove('active');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
-
 </html>
