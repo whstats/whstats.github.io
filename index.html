@@ -80,14 +80,21 @@
         }
 
         .content-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
             max-width: 1200px;
             margin: 0 auto;
+            display: flex;
+            gap: 30px;
+        }
+
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
         }
 
         .card {
+            width: 100%;
             background: white;
             border-radius: 10px;
             overflow: hidden;
@@ -125,7 +132,9 @@
 <body>
     <header>
         <div class="logo-container">
-            <div class="logo"></div>
+            <div class="logo" style="align-items: center; justify-content: baseline">
+              <img src="Wlogo.png" alt="logo" style="height: 100%; width: 100%;">
+            </div>
             <div class="title">我的主页</div>
         </div>
         <nav>
@@ -137,80 +146,49 @@
 
     <main id="visualization" class="active">
         <div class="content-grid">
-            <div class="card">
-                <img src="/api/placeholder/400/200" alt="可视化项目1">
-                <div class="card-content">
-                    <h3 class="card-title">数据可视化展示</h3>
-                    <p class="card-description">基于D3.js的交互式数据可视化项目，展示复杂数据关系。</p>
+            <div class="column">
+                <div class="card">
+                    <img src="a1.png" alt="可视化项目1">
+                    <div class="card-content">
+                        <h3 class="card-title">数据可视化展示</h3>
+                        <p class="card-description">基于D3.js的交互式数据可视化项目</p>
+                    </div>
                 </div>
             </div>
-            <div class="card">
-                <img src="/api/placeholder/400/200" alt="可视化项目2">
-                <div class="card-content">
-                    <h3 class="card-title">实时数据监控</h3>
-                    <p class="card-description">使用ECharts实现的实时数据监控系统。</p>
+            <div class="column">
+                <div class="card">
+                    <img src="a2.png" alt="可视化项目2">
+                    <div class="card-content">
+                        <h3 class="card-title">实时数据监控</h3>
+                        <p class="card-description">使用ECharts实现的实时数据监控系统。这是第二列的内容。</p>
+                    </div>
                 </div>
             </div>
-            <div class="card">
-                <img src="/api/placeholder/400/200" alt="可视化项目3">
-                <div class="card-content">
-                    <h3 class="card-title">地理信息可视化</h3>
-                    <p class="card-description">基于地理数据的信息可视化展示系统。</p>
+            <div class="column">
+                <div class="card">
+                    <img src="a1.png" alt="可视化项目3">
+                    <div class="card-content">
+                        <h3 class="card-title">地理信息可视化</h3>
+                        <p class="card-description">基于地理数据于地理数据于地理数据于地理数据于地理数据于地理数据于地理数据的信息可视化展示系统。这是第三列的内容。</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="a2.png" alt="可视化项目3">
+                    <div class="card-content">
+                        <h3 class="card-title">地理信息可视化33</h3>
+                        <p class="card-description">基于地理数据于地理数据于地理数据于地理数据于地理数据于地理数据于地理数据的信息可视化展示系统。这是第三列的内容。</p>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
     <main id="projects">
-        <div class="content-grid">
-            <div class="card">
-                <img src="/api/placeholder/400/200" alt="项目1">
-                <div class="card-content">
-                    <h3 class="card-title">Web应用开发</h3>
-                    <p class="card-description">使用React开发的现代化Web应用。</p>
-                </div>
-            </div>
-            <div class="card">
-                <img src="/api/placeholder/400/200" alt="项目2">
-                <div class="card-content">
-                    <h3 class="card-title">移动端开发</h3>
-                    <p class="card-description">基于Flutter的跨平台移动应用。</p>
-                </div>
-            </div>
-            <div class="card">
-                <img src="/api/placeholder/400/200" alt="项目3">
-                <div class="card-content">
-                    <h3 class="card-title">后端系统</h3>
-                    <p class="card-description">使用Node.js构建的高性能后端系统。</p>
-                </div>
-            </div>
-        </div>
+        
     </main>
 
     <main id="about">
-        <div class="content-grid">
-            <div class="card">
-                <img src="/api/placeholder/400/200" alt="个人简介">
-                <div class="card-content">
-                    <h3 class="card-title">关于我</h3>
-                    <p class="card-description">全栈开发工程师，热爱技术创新。</p>
-                </div>
-            </div>
-            <div class="card">
-                <img src="/api/placeholder/400/200" alt="技能">
-                <div class="card-content">
-                    <h3 class="card-title">技能专长</h3>
-                    <p class="card-description">前端开发、数据可视化、后端开发。</p>
-                </div>
-            </div>
-            <div class="card">
-                <img src="/api/placeholder/400/200" alt="联系方式">
-                <div class="card-content">
-                    <h3 class="card-title">联系方式</h3>
-                    <p class="card-description">邮箱、社交媒体等联系方式。</p>
-                </div>
-            </div>
-        </div>
+        
     </main>
 
     <script>
@@ -221,11 +199,9 @@
             tab.addEventListener('click', () => {
                 const tabId = tab.getAttribute('data-tab');
                 
-                // 更新标签页状态
                 tabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 
-                // 更新内容区域
                 mains.forEach(main => {
                     if (main.id === tabId) {
                         main.classList.add('active');
