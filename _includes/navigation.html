@@ -1,0 +1,13 @@
+<header class="px-4 py-4 border-b border-gray-800 bg-gray-50 flex justify-between items-center">
+  <a href="/" class="text-red-800 font-semibold text-2xl no-underline">
+    WHSTATS
+  </a>
+  <nav class="flex gap-8">
+    {% for item in site.data.navigation %}
+      <a href="{{ item.link }}" class="relative group no-underline text-gray-700 transition-colors duration-200 hover:text-red-800">
+        {{ item.name }}
+        <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-red-800 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-50 ease-out"></span>
+      </a>
+    {% endfor %}
+  </nav>
+ </header>

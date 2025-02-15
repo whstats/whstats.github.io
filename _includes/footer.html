@@ -1,0 +1,15 @@
+<footer class="bg-gray-50 border-t-4 border-gray-800">
+  <div class="max-w-6xl mx-auto px-20 py-4">
+    <div class="flex flex-wrap justify-center gap-2">
+      {% for item in site.data.footer %}
+        <a href="{{child.link}}" class="text-gray-600 hover:text-red-800 no-underline mx-4 p-1 font-light tracking-wide relative group">
+          {{ item.name }}
+          <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-red-900 transform scale-x-0 origin-center group-hover:origin-[0%_50%] group-hover:scale-x-100 transition-transform"></span>
+        </a>
+      {% endfor %}
+    </div>
+    <div class="mt-4 pt-2 border-t border-gray-200">
+      <p class="text-sm text-gray-400 text-center font-light tracking-wider">© 2025 Whstats. All Rights Reserved.</p>
+    </div>
+  </div>
+</footer>

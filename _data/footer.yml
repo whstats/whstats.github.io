@@ -1,0 +1,8 @@
+- name: 关于我
+  link: /about.html
+- name: 联系我
+  link: /contact.html
+- name: 二维可视化
+  link: /2d.html
+- name: 三维可视化
+  link: /3d.html
