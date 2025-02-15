@@ -1,13 +1,18 @@
 <div>
-  <!-- 卡片内容区域：添加动画效果 -->
-  <div class="transition-transform duration-300 hover:scale-105">
-    <div class="p-2">
-      <img src="{{ include.image }}" alt="图片" class="border border-gray-300 w-full mb-2" />
-      <h3 class="text-lg font-medium leading-snug my-font-color-red mb-1">{{ include.title }}</h3>
+  <div class="p-2 transition-transform duration-300 hover:scale-105">
+    <!-- <div class=""> -->
+      <a href="{{ include.url }}">
+        <img
+          src="{{ include.image }}"
+          alt="图片"
+          class="border border-gray-300 w-full mb-2"
+        />
+        <h3 class="text-lg font-medium leading-snug my-font-color-red mb-1">
+          {{ include.title }}
+        </h3>
+      </a>
       <p class="text-sm leading-snug mb-2">{{ include.description }}</p>
-    </div>
+    <!-- </div> -->
   </div>
-  
-  <!-- 分割线：保持静态 -->
   <div class="border-t border-1 border-gray-400 my-4"></div>
 </div>

@@ -26,12 +26,19 @@
   font-weight: 800;
 }
 
+.noto-serif-sc {
+  font-family: "Noto Serif SC", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-weight: 500;
+}
+
 .my-bg-color-yellow {
-  background-color: rgb(241, 239, 232);
+  background-color: rgb(255, 255, 255);
 }
 
 .my-bg-color-lightyellow {
-  background-color: rgb(241, 239, 232);
+  background-color: rgb(255, 255, 255);
 }
 
 .my-font-color-red {

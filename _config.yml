@@ -1,3 +1,15 @@
-collections:
-  authors:
-    output: true
+defaults:
+  - scope:
+      path: "_posts/c1"
+    values:
+      category: c1
+  - scope:
+      path: "_posts/c2"
+    values:
+      category: c2
+  - scope:
+      path: "_posts/c3"
+    values:
+      category: c3
+
+permalink: /:categories/:year/:month/:day/:title/

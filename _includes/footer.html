@@ -1,6 +1,6 @@
 <footer class="mt-20 border-t-4 border-gray-800">
   <div class="max-w-6xl mx-auto px-52 pt-4">
-    <div class="flex flex-wrap justify-center gap-2 border-b border-gray-400 pb-4">
+    <div class="flex flex-wrap justify-center gap-2 pb-4">
       {% for item in site.data.footer %}
         <a href="{{child.link}}" class="text-gray-600 hover:text-red-800 no-underline mx-4 p-1 noto-sans-sc-light tracking-wide relative group">
           {{ item.name }}
@@ -8,8 +8,11 @@
         </a>
       {% endfor %}
     </div>
-    <div class="mt-2 mb-8 mx-8">
-      <p class="text-sm text-gray-400 text-center font-light tracking-wider">© 2025 Whstats. All Rights Reserved.</p>
+    <div class="mt-2 mb-4 mx-8">
+      <p class="text-sm text-gray-400 text-center font-light tracking-wider">© 2025 WHStats. All Rights Reserved.</p>
+    </div>
+    <div class="flex justify-center mb-8">
+      <img src="/assets/images/WHStats_logo.png" alt="logo" class="w-16" />
     </div>
   </div>
 </footer>
