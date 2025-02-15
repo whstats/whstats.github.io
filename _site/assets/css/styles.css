@@ -9,7 +9,7 @@
   font-family: "Noto Sans SC", serif;
   font-optical-sizing: auto;
   font-style: normal;
-  font-weight: 250;
+  font-weight: 300;
 }
 
 .noto-sans-sc-bold {
@@ -24,6 +24,18 @@
   font-optical-sizing: auto;
   font-style: normal;
   font-weight: 800;
+}
+
+.my-bg-color-yellow {
+  background-color: rgb(241, 239, 232);
+}
+
+.my-bg-color-lightyellow {
+  background-color: rgb(241, 239, 232);
+}
+
+.my-font-color-red {
+  color: rgb(132, 17, 17);
 }
 
 /*# sourceMappingURL=styles.css.map */
