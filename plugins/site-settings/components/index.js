@@ -204,7 +204,7 @@ export function SiteSettings() {
               "span",
               null,
               h("strong", null, "Keyboard shortcuts"),
-              h("small", null, "J/K scroll; H/N/F open reading tools."),
+              h("small", null, "H/N/F open reading tools."),
             ),
             h("input", {
               type: "checkbox",
