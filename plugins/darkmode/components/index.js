@@ -17,7 +17,7 @@ export function Darkmode() {
     const button = BaseDarkmode(props)
     return cloneElement(
       button,
-      {},
+      { "aria-keyshortcuts": "n" },
       h(Sun, lucideProps(20, "dayIcon")),
       h(Moon, lucideProps(20, "nightIcon")),
     )

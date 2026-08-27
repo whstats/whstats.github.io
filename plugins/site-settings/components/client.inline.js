@@ -7,6 +7,7 @@
     measure: "44rem",
     lineHeight: "1.7",
     reduceMotion: false,
+    keyboardShortcuts: true,
   })
   const measures = new Set(["44rem", "47rem", "50rem"])
   const lineHeights = new Set(["1.55", "1.7", "1.78"])
@@ -34,6 +35,7 @@
       measure: measures.has(value.measure) ? value.measure : defaults.measure,
       lineHeight: lineHeights.has(storedLineHeight) ? storedLineHeight : defaults.lineHeight,
       reduceMotion: value.reduceMotion === true,
+      keyboardShortcuts: value.keyboardShortcuts !== false,
     }
   }
 
@@ -86,12 +88,18 @@
     root.style.setProperty("--reading-line-height", settings.lineHeight)
     root.toggleAttribute("data-reduce-motion", settings.reduceMotion)
     if (settings.reduceMotion) root.setAttribute("data-reduce-motion", "true")
+    root.setAttribute("data-keyboard-shortcuts", String(settings.keyboardShortcuts))
+    document.dispatchEvent(
+      new CustomEvent("keyboardshortcutschange", {
+        detail: { enabled: settings.keyboardShortcuts },
+      }),
+    )
   }
 
   const syncControls = (root, settings) => {
     for (const control of root.querySelectorAll("[data-settings-key]")) {
       const key = control.dataset.settingsKey
-      if (key === "reduceMotion") control.checked = settings.reduceMotion
+      if (key === "reduceMotion" || key === "keyboardShortcuts") control.checked = settings[key]
       else control.value = settings[key]
     }
 
@@ -106,6 +114,7 @@
       measure: root.querySelector('[data-settings-key="measure"]')?.value,
       lineHeight: root.querySelector('[data-settings-key="lineHeight"]')?.value,
       reduceMotion: root.querySelector('[data-settings-key="reduceMotion"]')?.checked,
+      keyboardShortcuts: root.querySelector('[data-settings-key="keyboardShortcuts"]')?.checked,
     })
 
   const initializeSiteSettings = () => {

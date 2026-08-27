@@ -39,6 +39,7 @@
     root.style.setProperty("--reading-measure", measure)
     root.style.setProperty("--reading-line-height", lineHeight)
     if (stored.reduceMotion === true) root.setAttribute("data-reduce-motion", "true")
+    if (stored.keyboardShortcuts === false) root.setAttribute("data-keyboard-shortcuts", "false")
   } catch {
     // Storage may be unavailable in hardened or private browser contexts.
   }

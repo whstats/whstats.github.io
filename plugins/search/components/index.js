@@ -19,7 +19,7 @@ export function Search(options) {
     const [, label] = childrenOf(button)
     const lucideButton = cloneElement(
       button,
-      {},
+      { "aria-keyshortcuts": "f" },
       h(SearchIcon, lucideProps(18, "search-icon")),
       label,
     )

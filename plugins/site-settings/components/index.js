@@ -17,6 +17,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   measure: "44rem",
   lineHeight: "1.7",
   reduceMotion: false,
+  keyboardShortcuts: true,
 })
 
 function clampInteger(value, minimum, maximum, fallback) {
@@ -36,6 +37,7 @@ export function normalizeSettings(value = {}) {
     measure: MEASURES.has(value.measure) ? value.measure : DEFAULT_SETTINGS.measure,
     lineHeight: LINE_HEIGHTS.has(storedLineHeight) ? storedLineHeight : DEFAULT_SETTINGS.lineHeight,
     reduceMotion: value.reduceMotion === true,
+    keyboardShortcuts: value.keyboardShortcuts !== false,
   }
 }
 
@@ -192,6 +194,21 @@ export function SiteSettings() {
             h("input", {
               type: "checkbox",
               "data-settings-key": "reduceMotion",
+            }),
+            h("span", { class: "site-settings-switch", "aria-hidden": "true" }),
+          ),
+          h(
+            "label",
+            { class: "site-settings-motion" },
+            h(
+              "span",
+              null,
+              h("strong", null, "Keyboard shortcuts"),
+              h("small", null, "J/K scroll; H/N/F open reading tools."),
+            ),
+            h("input", {
+              type: "checkbox",
+              "data-settings-key": "keyboardShortcuts",
             }),
             h("span", { class: "site-settings-switch", "aria-hidden": "true" }),
           ),

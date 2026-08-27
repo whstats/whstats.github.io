@@ -15,7 +15,11 @@ export function ReaderMode() {
 
   const Component = (props) => {
     const button = BaseReaderMode(props)
-    return cloneElement(button, {}, h(Focus, lucideProps(20, "readerIcon")))
+    return cloneElement(
+      button,
+      { "aria-keyshortcuts": "h" },
+      h(Focus, lucideProps(20, "readerIcon")),
+    )
   }
 
   Component.displayName = "ReaderMode"

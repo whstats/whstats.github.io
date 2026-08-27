@@ -94,6 +94,9 @@ plugins:
   - source: ./plugins/toc-active-heading
     enabled: true
     order: 55
+  - source: ./plugins/keyboard-shortcuts
+    enabled: true
+    order: 56
   - source: "@quartz-community/crawl-links"
     enabled: true
     options:
