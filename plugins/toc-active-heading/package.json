@@ -1,0 +1,18 @@
+{
+  "name": "@notes-on-statistics/toc-active-heading",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Single-section scroll tracking for the Quartz table of contents.",
+  "exports": "./index.js",
+  "quartz": {
+    "name": "toc-active-heading",
+    "displayName": "Active TOC Heading",
+    "description": "Highlights only the section aligned with the current reading position.",
+    "category": "transformer",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "defaultOrder": 55,
+    "defaultEnabled": true
+  }
+}

@@ -1,0 +1,332 @@
+.site-settings {
+  position: relative;
+  z-index: 60;
+  width: 20px;
+  height: 32px;
+  flex: 0 0 20px;
+  margin: 0;
+  color: var(--darkgray);
+  font-family: var(--bodyFont);
+}
+
+.site-settings > summary {
+  list-style: none;
+}
+
+.site-settings > summary::-webkit-details-marker {
+  display: none;
+}
+
+.site-settings-trigger {
+  display: grid;
+  width: 20px;
+  height: 32px;
+  place-items: center;
+  box-sizing: border-box;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--darkgray);
+  cursor: pointer;
+}
+
+.site-settings-trigger svg {
+  width: 20px;
+  height: 20px;
+  transition:
+    color 140ms ease,
+    transform 180ms ease;
+}
+
+.site-settings-trigger:hover,
+.site-settings[open] > .site-settings-trigger {
+  color: var(--secondary);
+}
+
+.site-settings[open] > .site-settings-trigger svg {
+  transform: translateY(-1px);
+}
+
+.site-settings-scrim {
+  display: none;
+}
+
+.site-settings:not([open]) > .site-settings-panel,
+.site-settings:not([open]) > .site-settings-scrim {
+  display: none;
+}
+
+.site-settings-panel {
+  position: absolute;
+  top: calc(100% + 0.65rem);
+  right: -0.75rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-flow: row;
+  width: min(17.5rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 7rem);
+  box-sizing: border-box;
+  padding: 1rem;
+  overflow-y: auto;
+  border: 1px solid color-mix(in srgb, var(--gray) 42%, transparent);
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--light) 96%, var(--lightgray));
+  box-shadow:
+    0 22px 55px rgb(22 27 29 / 16%),
+    0 2px 8px rgb(22 27 29 / 7%);
+  color: var(--darkgray);
+  scrollbar-width: thin;
+}
+
+.site-settings-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--lightgray) 82%, transparent);
+}
+
+.site-settings-header h2 {
+  margin: 0;
+  color: var(--dark);
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.site-settings-header p {
+  margin: 0.2rem 0 0;
+  color: var(--gray);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.site-settings-close {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: 0 0 1.75rem;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--gray);
+  cursor: pointer;
+}
+
+.site-settings-close:hover {
+  background: var(--highlight);
+  color: var(--dark);
+}
+
+.site-settings-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.site-settings-fields {
+  display: grid;
+  gap: 0.95rem;
+  padding: 0.95rem 0 0.9rem;
+}
+
+.site-settings-field {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.site-settings-field-heading {
+  display: flex;
+  min-height: 1.25rem;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--darkgray);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.site-settings-field output {
+  color: var(--gray);
+  font-family: var(--codeFont);
+  font-size: 0.73rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-settings-field input[type="range"] {
+  width: 100%;
+  height: 1rem;
+  margin: 0;
+  accent-color: var(--secondary);
+  cursor: pointer;
+}
+
+.site-settings-field select {
+  width: 100%;
+  min-height: 2.1rem;
+  box-sizing: border-box;
+  padding: 0.35rem 2rem 0.35rem 0.55rem;
+  border: 1px solid var(--lightgray);
+  border-radius: 0.48rem;
+  background: var(--light);
+  color: var(--darkgray);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.site-settings-motion {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.2rem 1rem;
+  padding-top: 0.1rem;
+  cursor: pointer;
+}
+
+.site-settings-motion > span:first-child {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.site-settings-motion strong {
+  color: var(--darkgray);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.site-settings-motion small {
+  color: var(--gray);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.site-settings-motion input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.site-settings-switch {
+  position: relative;
+  width: 2rem;
+  height: 1.1rem;
+  border: 1px solid var(--gray);
+  border-radius: 999px;
+  background: var(--lightgray);
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.site-settings-switch::after {
+  position: absolute;
+  top: 0.13rem;
+  left: 0.14rem;
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 50%;
+  background: var(--darkgray);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 18%);
+  content: "";
+  transition:
+    background-color 140ms ease,
+    transform 140ms ease;
+}
+
+.site-settings-motion input:checked + .site-settings-switch {
+  border-color: var(--secondary);
+  background: color-mix(in srgb, var(--secondary) 72%, var(--light));
+}
+
+.site-settings-motion input:checked + .site-settings-switch::after {
+  background: var(--light);
+  transform: translateX(0.88rem);
+}
+
+.site-settings-motion input:focus-visible + .site-settings-switch {
+  outline: 2px solid var(--secondary);
+  outline-offset: 3px;
+}
+
+.site-settings-motion input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.site-settings-footer {
+  display: flex;
+  min-height: 1.6rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid color-mix(in srgb, var(--lightgray) 82%, transparent);
+}
+
+.site-settings-footer button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--secondary);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.site-settings-footer button:hover {
+  color: var(--tertiary);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.site-settings-status {
+  color: var(--gray);
+  font-size: 0.7rem;
+  line-height: 1.3;
+}
+
+@media (max-width: 800px) {
+  .site-settings[open] {
+    z-index: 80;
+  }
+
+  .site-settings-scrim {
+    position: fixed;
+    z-index: 80;
+    inset: 0;
+    display: block;
+    width: 100vw;
+    height: 100dvh;
+    padding: 0;
+    border: 0;
+    background: rgb(18 22 24 / 28%);
+    backdrop-filter: blur(2px);
+    cursor: default;
+  }
+
+  .site-settings-panel {
+    position: fixed;
+    z-index: 81;
+    inset: auto 1rem 1rem;
+    width: auto;
+    max-height: calc(100dvh - 2rem);
+    border-radius: 1rem;
+    background: var(--light);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-settings-trigger svg,
+  .site-settings-switch,
+  .site-settings-switch::after {
+    transition: none;
+  }
+}

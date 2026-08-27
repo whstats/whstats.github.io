@@ -5,6 +5,9 @@ import { googleFontHref, googleFontSubsetHref } from "../util/theme"
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 import { unescapeHTML } from "../util/escape"
 
+const readingFontHref =
+  "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400;1,600&display=swap"
+
 export default (() => {
   const Head: QuartzComponent = ({
     cfg,
@@ -57,6 +60,7 @@ export default (() => {
             )}
           </>
         )}
+        <link rel="stylesheet" href={readingFontHref} />
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="anonymous" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 

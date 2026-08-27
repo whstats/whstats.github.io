@@ -1,0 +1,58 @@
+.clipboard-button {
+  position: absolute;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.3rem;
+  padding: 0.4rem;
+  color: var(--gray);
+  background-color: var(--light);
+  border: 1px solid var(--dark);
+  border-radius: 5px;
+  opacity: 0;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.clipboard-button > .clipboard-icon {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+}
+
+.clipboard-button > .clipboard-icon-success {
+  display: none;
+}
+
+.clipboard-button.is-copied {
+  color: var(--tertiary);
+  border-color: var(--tertiary);
+}
+
+.clipboard-button.is-copied > .clipboard-icon-copy {
+  display: none;
+}
+
+.clipboard-button.is-copied > .clipboard-icon-success {
+  display: block;
+}
+
+.clipboard-button:hover {
+  cursor: pointer;
+  color: var(--secondary);
+  border-color: var(--secondary);
+}
+
+.clipboard-button:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+pre:hover > .clipboard-button {
+  opacity: 1;
+}

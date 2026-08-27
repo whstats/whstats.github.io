@@ -1,0 +1,33 @@
+{
+  "name": "@notes-on-statistics/reader-mode",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./components": "./components/index.js"
+  },
+  "peerDependencies": {
+    "preact": "^10.0.0"
+  },
+  "dependencies": {
+    "@quartz-community/reader-mode": "^0.1.0",
+    "lucide-preact": "^1.34.0"
+  },
+  "quartz": {
+    "name": "reader-mode",
+    "displayName": "Reader Mode",
+    "description": "Quartz reader mode with the official Lucide focus icon.",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "defaultEnabled": true,
+    "components": {
+      "ReaderMode": {
+        "displayName": "Reader Mode",
+        "defaultPosition": "left",
+        "defaultPriority": 35
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "@notes-on-statistics/explorer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./components": "./components/index.js"
+  },
+  "peerDependencies": {
+    "preact": "^10.0.0"
+  },
+  "dependencies": {
+    "@quartz-community/explorer": "^0.1.0",
+    "lucide-preact": "^1.34.0"
+  },
+  "quartz": {
+    "name": "explorer",
+    "displayName": "Explorer",
+    "description": "Quartz explorer with official Lucide navigation icons.",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "defaultEnabled": true,
+    "defaultOptions": {
+      "folderDefaultState": "collapsed",
+      "folderClickBehavior": "link",
+      "useSavedState": true
+    },
+    "components": {
+      "Explorer": {
+        "displayName": "Explorer",
+        "defaultPosition": "left",
+        "defaultPriority": 50
+      }
+    }
+  }
+}

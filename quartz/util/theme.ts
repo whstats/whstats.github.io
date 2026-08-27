@@ -49,6 +49,15 @@ export function getFontSpecificationName(spec: FontSpecification): string {
   return spec.name
 }
 
+function isFontFamilyStack(spec: FontSpecification): boolean {
+  return getFontSpecificationName(spec).includes(",")
+}
+
+function cssFontFamily(spec: FontSpecification, fallback: string): string {
+  const name = getFontSpecificationName(spec)
+  return isFontFamilyStack(spec) ? name : `${JSON.stringify(name)}, ${fallback}`
+}
+
 function formatFontSpecification(
   type: "title" | "header" | "body" | "code",
   spec: FontSpecification,
@@ -87,11 +96,16 @@ function formatFontSpecification(
 
 export function googleFontHref(theme: Theme) {
   const { header, body, code } = theme.typography
-  const headerFont = formatFontSpecification("header", header)
-  const bodyFont = formatFontSpecification("body", body)
-  const codeFont = formatFontSpecification("code", code)
+  const fonts = [
+    ["header", header],
+    ["body", body],
+    ["code", code],
+  ] as const
+  const googleFonts = fonts
+    .filter(([, spec]) => !isFontFamilyStack(spec))
+    .map(([type, spec]) => formatFontSpecification(type, spec))
 
-  return `https://fonts.googleapis.com/css2?family=${headerFont}&family=${bodyFont}&family=${codeFont}&display=swap`
+  return `https://fonts.googleapis.com/css2?${googleFonts.map((font) => `family=${font}`).join("&")}&display=swap`
 }
 
 export function googleFontSubsetHref(theme: Theme, text: string) {
@@ -188,10 +202,10 @@ ${stylesheet.join("\n\n")}
   --highlight: ${theme.colors.lightMode.highlight};
   --textHighlight: ${theme.colors.lightMode.textHighlight};
 
-  --titleFont: "${getFontSpecificationName(theme.typography.title || theme.typography.header)}", ${DEFAULT_SANS_SERIF};
-  --headerFont: "${getFontSpecificationName(theme.typography.header)}", ${DEFAULT_SANS_SERIF};
-  --bodyFont: "${getFontSpecificationName(theme.typography.body)}", ${DEFAULT_SANS_SERIF};
-  --codeFont: "${getFontSpecificationName(theme.typography.code)}", ${DEFAULT_MONO};
+  --titleFont: ${cssFontFamily(theme.typography.title || theme.typography.header, DEFAULT_SANS_SERIF)};
+  --headerFont: ${cssFontFamily(theme.typography.header, DEFAULT_SANS_SERIF)};
+  --bodyFont: ${cssFontFamily(theme.typography.body, DEFAULT_SANS_SERIF)};
+  --codeFont: ${cssFontFamily(theme.typography.code, DEFAULT_MONO)};
 }
 
 :root[saved-theme="dark"] {

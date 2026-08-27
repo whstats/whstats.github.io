@@ -1,3 +1,795 @@
 @use "./variables.scss" as *;
 
-// put your custom CSS here!
+// Quartz's native three-column frame owns layout. This layer defines the
+// reading surface, mathematical content, and accessibility details.
+:root {
+  --surface: color-mix(in srgb, var(--lightgray) 28%, var(--light));
+  --hairline: color-mix(in srgb, var(--gray) 28%, transparent);
+  --focus-ring: color-mix(in srgb, var(--secondary) 38%, transparent);
+  --soft-shadow: 0 18px 50px rgb(20 28 24 / 0.1);
+  --inline-code-surface: color-mix(in srgb, var(--lightgray) 36%, var(--light));
+  --citation-gold: color-mix(in srgb, #c27a16 78%, var(--dark));
+  --overflow-thumb: color-mix(in srgb, var(--gray) 62%, transparent);
+  --overflow-thumb-hover: color-mix(in srgb, var(--darkgray) 62%, transparent);
+
+  // One editorial type system drives the complete reading surface. Interface
+  // components use Quartz's system-font styling.
+  --reading-font-ibm-plex-serif:
+    "IBM Plex Serif", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, ui-serif, serif;
+  --reading-font-minion-pro:
+    "Minion Pro", Minion, "Adobe Garamond Pro", "Iowan Old Style", Georgia, ui-serif, serif;
+  --reading-font-times-new-roman: "Times New Roman", Times, ui-serif, serif;
+  --reading-font-system:
+    -apple-system-body, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --reading-body-font: var(--reading-font-ibm-plex-serif);
+  --reading-heading-font:
+    "IBM Plex Sans", -apple-system-body, ui-sans-serif, -apple-system, system-ui, "Segoe UI",
+    sans-serif;
+  --type-body-base: 1.1rem;
+  --reader-font-scale: 1;
+  --reading-font-size: calc(var(--type-body-base) * var(--reader-font-scale));
+  --reading-line-height: 1.7;
+  --reading-measure: 44rem;
+  --type-page-title: calc(var(--reading-font-size) * 1.875);
+  --type-meta: calc(var(--reading-font-size) * 0.875);
+  --type-h2: calc(var(--reading-font-size) * 1.5);
+  --type-h3: calc(var(--reading-font-size) * 1.25);
+  --type-h4: calc(var(--reading-font-size) * 1.125);
+  --type-h5: var(--reading-font-size);
+  --type-h6: calc(var(--reading-font-size) * 0.9375);
+  --type-caption: calc(var(--reading-font-size) * 0.875);
+  --type-table: calc(var(--reading-font-size) * 0.9375);
+  --type-code-inline: 0.95em;
+  --type-code-block: calc(var(--reading-font-size) * 0.875);
+  --type-math: calc(var(--reading-font-size) * 1.1);
+  --leading-heading: 1.2;
+  --leading-compact: 1.45;
+  --space-section: 2.5rem;
+  --space-subsection: 2rem;
+  --space-heading: 1.5rem;
+  --space-heading-after: 0.75rem;
+  --space-heading-number: 0.4em;
+  --space-equation-inline: clamp(0.75rem, 2vw, 1.25rem);
+  --space-page-top: 3rem;
+  --space-breadcrumb-title: 3rem;
+}
+
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
+a,
+button,
+input,
+summary {
+  &:focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 3px;
+    border-radius: 4px;
+    box-shadow: 0 0 0 4px var(--focus-ring);
+  }
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 1000;
+  padding: 0.6rem 0.85rem;
+  color: var(--light);
+  background: var(--dark);
+  border-radius: 6px;
+  box-shadow: var(--soft-shadow);
+  transform: translateY(calc(-100% - 1rem));
+
+  &:focus {
+    transform: translateY(0);
+  }
+}
+
+// A focused measure supports long-form reading inside Quartz's three-column frame.
+.center > .page-header,
+.center > article,
+.center > .popover-hint,
+.center > .page-footer {
+  width: 100%;
+  max-width: var(--reading-measure);
+  margin-inline: auto;
+}
+
+body:not([data-slug="404"]) .page > #quartz-body .center > .page-header {
+  margin-top: var(--space-page-top);
+
+  .breadcrumb-container {
+    margin-top: 0;
+    margin-bottom: var(--space-breadcrumb-title);
+  }
+
+  .article-title {
+    margin-top: 0;
+  }
+}
+
+body:not([data-slug="404"]) .center > article,
+body:not([data-slug="404"]) .center > .popover-hint {
+  margin-bottom: 18rem;
+}
+
+html:has(> body[data-slug="404"]),
+body[data-slug="404"] {
+  height: 100%;
+  overflow: hidden;
+}
+
+body[data-slug="404"] .page[data-frame="minimal"],
+body[data-slug="404"] .page[data-frame="minimal"] > #quartz-body,
+body[data-slug="404"] .page[data-frame="minimal"] .center.minimal {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+}
+
+body[data-slug="404"] .page[data-frame="minimal"] {
+  max-width: none;
+}
+
+body[data-slug="404"] .page[data-frame="minimal"] > #quartz-body {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: "grid-center";
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.center.minimal > article.not-found {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 1rem;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.not-found-content {
+  width: min(100%, var(--reading-measure));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+
+  > * {
+    margin: 0;
+  }
+
+  > h1 {
+    font-size: 2rem;
+  }
+}
+
+.center > .page-header .article-title,
+.popover > .popover-inner[data-content-type^="text/html"] .article-title {
+  font-family: var(--reading-heading-font);
+  font-size: var(--type-page-title);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.center > .page-header .content-meta,
+.popover > .popover-inner[data-content-type^="text/html"] .content-meta {
+  font-family: var(--reading-heading-font);
+  font-size: var(--type-meta);
+  font-weight: 400;
+  line-height: var(--leading-compact);
+}
+
+.popover > .popover-inner[data-content-type^="text/html"] {
+  font-size: inherit;
+  font-weight: inherit;
+  font-style: inherit;
+  line-height: inherit;
+  user-select: text;
+  cursor: auto;
+
+  article > h1 {
+    font-family: var(--reading-heading-font);
+    font-size: var(--type-page-title);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+}
+
+// Grid children use an automatic min-width by default, which lets a single
+// unbreakable equation widen the middle track. Opt the reading column and its
+// common nested containers into shrinking so overflow remains within its
+// owning item.
+.page > #quartz-body,
+.page > #quartz-body > .center,
+:is(
+  .center > article,
+  .center > .popover-hint > article,
+  .popover-inner[data-content-type^="text/html"] article
+),
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  > *,
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  :where(.callout-content, blockquote, li, .transclude) {
+  min-width: 0;
+}
+
+:is(
+  .center > article,
+  .center > .popover-hint > article,
+  .popover-inner[data-content-type^="text/html"] article
+) {
+  font-family: var(--reading-body-font);
+  font-size: var(--reading-font-size);
+  text-wrap: pretty;
+
+  p,
+  li,
+  blockquote:not(.callout),
+  .callout-content {
+    line-height: var(--reading-line-height);
+  }
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+.center > .popover-hint > .page-listing {
+  font-family: var(--reading-body-font);
+  font-size: var(--reading-font-size);
+  text-wrap: pretty;
+
+  :is(p, li) {
+    line-height: var(--reading-line-height);
+  }
+
+  :is(h2, h3, h4, h5, h6) {
+    font-family: var(--reading-heading-font);
+  }
+}
+
+:is(
+  .center > article,
+  .center > .popover-hint > article,
+  .popover-inner[data-content-type^="text/html"] article
+) {
+  counter-reset: note-h2 note-h3 note-h4 note-h5 note-h6;
+
+  :is(h2, h3, h4, h5, h6):not(.sr-only) {
+    color: var(--dark);
+    font-family: var(--reading-heading-font);
+    font-weight: 600;
+    line-height: var(--leading-heading);
+    text-wrap: balance;
+    scroll-margin-top: 1.5rem;
+
+    &::before {
+      margin-right: var(--space-heading-number);
+      color: var(--gray);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  h2:not(.sr-only) {
+    counter-increment: note-h2;
+    counter-reset: note-h3 note-h4 note-h5 note-h6;
+    margin-top: var(--space-section);
+    margin-bottom: var(--space-heading-after);
+    font-size: var(--type-h2);
+    letter-spacing: -0.015em;
+
+    &::before {
+      content: counter(note-h2);
+    }
+  }
+
+  h3:not(.sr-only) {
+    counter-increment: note-h3;
+    counter-reset: note-h4 note-h5 note-h6;
+    margin-top: var(--space-subsection);
+    margin-bottom: var(--space-heading-after);
+    font-size: var(--type-h3);
+    letter-spacing: -0.01em;
+
+    &::before {
+      content: counter(note-h2) "." counter(note-h3);
+    }
+  }
+
+  h4:not(.sr-only) {
+    counter-increment: note-h4;
+    counter-reset: note-h5 note-h6;
+    margin-top: var(--space-heading);
+    margin-bottom: var(--space-heading-after);
+    font-size: var(--type-h4);
+
+    &::before {
+      content: counter(note-h2) "." counter(note-h3) "." counter(note-h4);
+    }
+  }
+
+  h5:not(.sr-only) {
+    counter-increment: note-h5;
+    counter-reset: note-h6;
+    margin-top: var(--space-heading);
+    margin-bottom: var(--space-heading-after);
+    font-size: var(--type-h5);
+
+    &::before {
+      content: counter(note-h2) "." counter(note-h3) "." counter(note-h4) "." counter(note-h5);
+    }
+  }
+
+  h6:not(.sr-only) {
+    counter-increment: note-h6;
+    margin-top: var(--space-heading);
+    margin-bottom: var(--space-heading-after);
+    font-size: var(--type-h6);
+    letter-spacing: 0.01em;
+
+    &::before {
+      content: counter(note-h2) "." counter(note-h3) "." counter(note-h4) "." counter(note-h5) "."
+        counter(note-h6);
+    }
+  }
+}
+
+a.external {
+  text-decoration-line: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.16em;
+  text-decoration-skip-ink: auto;
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  a.internal[data-slug]:not(.tag-link):not(:has(> img)) {
+  padding: 0;
+  border-radius: 0;
+  background-color: transparent;
+  line-height: inherit;
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-thickness: 0.07em;
+  text-underline-offset: 0.18em;
+  text-decoration-color: color-mix(in srgb, currentColor 68%, transparent);
+  text-decoration-skip-ink: auto;
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  :where(code, pre, kbd, samp) {
+  font-family: var(--codeFont);
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  :not(pre)
+  > code {
+  padding-inline: 0.3em;
+  background: var(--inline-code-surface);
+  font-size: var(--type-code-inline);
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  a[data-footnote-ref] {
+  padding: 0;
+  border-radius: 0;
+  color: var(--citation-gold);
+  background: transparent;
+  font-weight: 600;
+  line-height: inherit;
+  text-decoration: none;
+
+  &:hover {
+    color: color-mix(in srgb, var(--citation-gold) 78%, var(--dark));
+    text-decoration: underline;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.14em;
+  }
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  figure:has(> img) {
+  width: fit-content;
+  max-width: 100%;
+  margin: 1.5rem auto;
+  text-align: center;
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  figcaption {
+  margin-top: 0.5rem;
+  color: color-mix(in srgb, var(--darkgray) 72%, var(--gray));
+  font-size: var(--type-caption);
+  line-height: var(--leading-compact);
+  text-align: center;
+}
+
+// Mathematical blocks used throughout the notebook.
+.callout {
+  margin: 1.45rem 0;
+  border: 0;
+  border-radius: 8px;
+
+  > .callout-title {
+    padding-block: 0.78rem;
+
+    > .callout-icon {
+      display: none;
+    }
+  }
+
+  > .callout-content > :last-child {
+    margin-bottom: 0.95rem;
+  }
+
+  > .callout-content
+    > :not(.math-source[data-math-display="true"])
+    + .math-source[data-math-display="true"]
+    > .katex-display {
+    margin-top: 0;
+  }
+
+  &[data-callout="definition"] {
+    --color: color-mix(in srgb, var(--secondary) 78%, var(--dark));
+    --bg: color-mix(in srgb, var(--secondary) 6%, transparent);
+  }
+
+  &[data-callout="theorem"] {
+    --color: var(--secondary);
+    --bg: color-mix(in srgb, var(--secondary) 9%, transparent);
+  }
+
+  &[data-callout="proof"] {
+    --color: color-mix(in srgb, var(--darkgray) 68%, var(--gray));
+    --bg: color-mix(in srgb, var(--gray) 5%, transparent);
+  }
+
+  &[data-callout="example"] {
+    --color: color-mix(in srgb, var(--secondary) 60%, #9a6a2f);
+    --bg: color-mix(in srgb, var(--color) 6%, transparent);
+  }
+
+  &[data-callout="remark"] {
+    --color: color-mix(in srgb, var(--darkgray) 58%, var(--secondary));
+    --bg: color-mix(in srgb, var(--color) 5%, transparent);
+  }
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  .callout
+  > .callout-title {
+  font-family: var(--reading-heading-font);
+  font-size: var(--type-table);
+  font-weight: 600;
+  line-height: var(--leading-compact);
+}
+
+// Equations, code, and data use local horizontal scrolling. A slim themed
+// scrollbar with reserved space below the content provides glyph clearance
+// on systems with persistent scrollbars.
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  :where(
+    .katex-display,
+    .math.math-display,
+    mjx-container[display="true"],
+    .typst-doc,
+    .table-container,
+    pre
+  ) {
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: var(--overflow-thumb) transparent;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    height: 0.4rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background-color: var(--overflow-thumb);
+    background-clip: padding-box;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--overflow-thumb-hover);
+  }
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  :where(mjx-container[display="true"], .math.math-display, .typst-doc) {
+  padding-block: 0.5rem;
+}
+
+// KaTeX supplies the mathematical face. Inline and display notation share
+// one scale so mathematical content has consistent visual weight.
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  .katex {
+  font-size: var(--type-math);
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  .katex-display {
+  margin: 1.25em 0;
+  padding: 0.55em 0;
+
+  > .katex {
+    box-sizing: border-box;
+    display: block;
+    width: max-content;
+    min-width: 100%;
+    padding-inline: var(--space-equation-inline);
+    text-align: center;
+  }
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  pre {
+  font-size: var(--type-code-block);
+  line-height: var(--leading-compact);
+  padding-block: 0.65rem;
+  border-color: var(--hairline);
+  border-radius: 8px;
+  background: var(--surface);
+
+  // The outer pre owns one scrollbar and preserves the bottom gutter.
+  > code {
+    box-sizing: border-box;
+    width: max-content;
+    min-width: 100%;
+    padding-block: 0;
+    font-size: inherit;
+    overflow: visible;
+  }
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  figure[data-rehype-pretty-code-figure]
+  > [data-rehype-pretty-code-title] {
+  font-size: var(--type-code-block);
+  line-height: var(--leading-compact);
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  code {
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  .table-container {
+  margin-block: 1.35rem 1.65rem;
+  padding-block: 0.2rem 0.45rem;
+
+  > table {
+    width: 100%;
+    min-width: 34rem;
+    margin: 0;
+    padding: 0;
+    border-collapse: collapse;
+    border-top: 2px solid color-mix(in srgb, var(--darkgray) 82%, var(--gray));
+    border-bottom: 2px solid color-mix(in srgb, var(--darkgray) 82%, var(--gray));
+    background: transparent;
+    font-family: var(--reading-body-font);
+    font-size: var(--type-table);
+
+    th,
+    td {
+      padding: 0.72rem 1rem;
+      vertical-align: middle;
+      line-height: var(--leading-compact);
+    }
+
+    th {
+      color: var(--dark);
+      font-family: var(--reading-heading-font);
+      font-size: 1em;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      border-bottom: 1px solid color-mix(in srgb, var(--darkgray) 62%, var(--gray));
+    }
+
+    tbody {
+      tr {
+        border: 0;
+      }
+
+      td {
+        border: 0;
+      }
+    }
+  }
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  blockquote:not(.callout) {
+  border-left-color: color-mix(in srgb, var(--secondary) 55%, transparent);
+  color: color-mix(in srgb, var(--darkgray) 82%, var(--gray));
+}
+
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  .footnotes {
+  font-size: var(--type-caption);
+  line-height: var(--leading-compact);
+
+  :is(p, li) {
+    line-height: var(--leading-compact);
+  }
+}
+
+// The TOC emphasizes the section aligned with the reading position.
+ul.toc-content.overflow > li > a.in-view {
+  opacity: 0.35;
+}
+
+ul.toc-content.overflow > li > a.toc-current.toc-current {
+  color: var(--secondary);
+  opacity: 1;
+  font-weight: 700;
+}
+
+// The frame separator is redundant when no after-body components are shown.
+.center > hr,
+.page-footer:empty,
+footer:empty {
+  display: none;
+}
+
+@media all and ($mobile) {
+  body:not([data-slug="404"]) .page > #quartz-body .center > .page-header {
+    margin-top: 0;
+  }
+
+  :is(
+      .center > article,
+      .center > .popover-hint > article,
+      .popover-inner[data-content-type^="text/html"] article
+    )
+    :is(h2, h3, h4, h5, h6):not(.sr-only) {
+    scroll-margin-top: 6rem;
+  }
+
+  // Quartz's full-viewport Explorer is positioned inside the padded mobile
+  // grid. Offset that padding so the drawer ends exactly at the viewport edge.
+  .page > #quartz-body .explorer .explorer-content {
+    left: -1rem;
+  }
+}
+
+:root[data-reduce-motion="true"] {
+  scroll-behavior: auto;
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

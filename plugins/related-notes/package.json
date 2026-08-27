@@ -1,0 +1,79 @@
+{
+  "name": "@notes-on-statistics/related-notes",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A compact Quartz sidebar panel for incoming and outgoing note links.",
+  "exports": {
+    ".": "./index.js",
+    "./components": "./components/index.js"
+  },
+  "main": "./index.js",
+  "sideEffects": false,
+  "scripts": {
+    "test": "node --test"
+  },
+  "peerDependencies": {
+    "preact": "^10.0.0"
+  },
+  "dependencies": {
+    "@quartz-community/utils": "^0.1.0",
+    "lucide-preact": "^1.34.0"
+  },
+  "quartz": {
+    "name": "related-notes",
+    "displayName": "Related Notes",
+    "description": "Shows published notes linking to and from the current note.",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [
+      "@quartz-community/crawl-links"
+    ],
+    "defaultOrder": 65,
+    "defaultEnabled": true,
+    "defaultOptions": {
+      "hideWhenEmpty": false,
+      "title": "Related Notes",
+      "incomingLabel": "Links to this note",
+      "outgoingLabel": "Links from this note",
+      "emptyText": "No related notes yet."
+    },
+    "configSchema": {
+      "type": "object",
+      "properties": {
+        "hideWhenEmpty": {
+          "type": "boolean"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "incomingLabel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outgoingLabel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "emptyText": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "components": {
+      "RelatedNotes": {
+        "name": "RelatedNotes",
+        "displayName": "Related Notes",
+        "description": "Incoming and outgoing links for the current published note.",
+        "version": "1.0.0",
+        "quartzVersion": ">=5.0.0",
+        "defaultPosition": "right",
+        "defaultPriority": 40
+      }
+    }
+  }
+}

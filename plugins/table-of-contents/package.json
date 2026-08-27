@@ -1,0 +1,44 @@
+{
+  "name": "@notes-on-statistics/table-of-contents",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./components": "./components/index.js"
+  },
+  "peerDependencies": {
+    "preact": "^10.0.0"
+  },
+  "dependencies": {
+    "@quartz-community/table-of-contents": "^0.1.0",
+    "lucide-preact": "^1.34.0"
+  },
+  "quartz": {
+    "name": "table-of-contents",
+    "displayName": "Table of Contents",
+    "description": "Quartz table of contents with the official Lucide chevron icon.",
+    "category": [
+      "transformer",
+      "component"
+    ],
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "defaultEnabled": true,
+    "defaultOrder": 50,
+    "defaultOptions": {
+      "maxDepth": 3,
+      "minEntries": 1,
+      "showByDefault": true,
+      "collapseByDefault": false,
+      "layout": "modern"
+    },
+    "components": {
+      "TableOfContents": {
+        "displayName": "Table of Contents",
+        "defaultPosition": "right",
+        "defaultPriority": 50
+      }
+    }
+  }
+}

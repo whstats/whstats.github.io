@@ -1,0 +1,128 @@
+.related-notes {
+  display: flex;
+  min-width: 0;
+  flex: 0 1 auto;
+  flex-direction: column;
+  gap: 0.85rem;
+  color: var(--darkgray);
+}
+
+.related-notes__title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  color: var(--dark);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.related-notes__title-icon {
+  flex: 0 0 auto;
+  stroke: currentColor;
+}
+
+.related-notes__section {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.38rem;
+}
+
+.related-notes__section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0;
+  color: var(--gray);
+  font-family: var(--bodyFont);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.related-notes__count {
+  min-width: 1.3rem;
+  color: color-mix(in srgb, var(--darkgray) 70%, var(--gray));
+  font-family: var(--codeFont);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.related-notes__list {
+  display: flex;
+  max-height: min(14rem, 28vh);
+  flex-direction: column;
+  gap: 0.12rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.related-notes__item {
+  min-width: 0;
+  margin: 0;
+}
+
+.related-notes a.related-notes__link {
+  position: relative;
+  display: block;
+  padding: 0.22rem 0 0.22rem 0.78rem;
+  color: color-mix(in srgb, var(--darkgray) 84%, var(--gray));
+  background: transparent;
+  font-family: var(--bodyFont);
+  font-size: 0.9rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.related-notes__link::before {
+  position: absolute;
+  top: 0.75em;
+  left: 0.12rem;
+  width: 0.25rem;
+  height: 0.25rem;
+  background: var(--gray);
+  border-radius: 50%;
+  content: "";
+  opacity: 0.6;
+}
+
+.related-notes__link:hover {
+  color: var(--secondary);
+}
+
+.related-notes__link:hover::before {
+  background: var(--secondary);
+  opacity: 1;
+}
+
+.related-notes__link:focus-visible {
+  color: var(--secondary);
+}
+
+.related-notes__empty {
+  margin: -0.12rem 0 0;
+  color: var(--gray);
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .related-notes__link,
+  .related-notes__link::before {
+    transition:
+      color 140ms ease,
+      background-color 140ms ease,
+      opacity 140ms ease;
+  }
+}
