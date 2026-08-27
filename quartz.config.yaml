@@ -101,6 +101,7 @@ plugins:
     enabled: true
     options:
       markdownLinkResolution: shortest
+      openLinksInNewTab: true
       externalLinkIcon: false
     order: 60
   - source: ./plugins/related-notes

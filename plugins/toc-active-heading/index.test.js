@@ -11,4 +11,6 @@ test("loads a local after-DOM script for single-section TOC tracking", () => {
   assert.match(resources.js[0].script, /toc-current/)
   assert.match(resources.js[0].script, /aria-current/)
   assert.match(resources.js[0].script, /scrollPaddingTop/)
+  assert.match(resources.js[0].script, /scrollMarginTop/)
+  assert.match(resources.js[0].script, /scrollPadding \+ scrollMargin/)
 })

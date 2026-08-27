@@ -1,18 +1,42 @@
 import { cloneElement, h } from "preact"
-import { ChevronDown, ListTree } from "lucide-preact"
+import { ListTree } from "lucide-preact"
 import { TableOfContents as QuartzTableOfContents } from "@quartz-community/table-of-contents/components"
 import { htmlToJsx } from "@quartz-community/utils"
 import { childrenOf, inheritComponentResources, lucideProps } from "../../_shared/lucide.js"
 
 const iconCss = `
-button.toc-header > .toc-title-icon {
+.toc-static-header {
+  display: flex;
+  align-items: center;
+  color: var(--dark);
+}
+
+.toc-static-header > .toc-title-icon {
   flex: 0 0 auto;
   margin-right: 0.4rem;
   stroke: currentColor;
 }
 
+.toc-static-header > h3 {
+  display: inline-block;
+  margin: 0;
+  font-size: 1rem;
+}
+
 ul.toc-content.overflow > li > a {
+  display: block;
+  height: 1.6rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   font-size: 0.9rem;
+  line-height: 1.6rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+ul.toc-content.overflow > li.depth-1 > a {
+  font-size: 0.85rem;
 }
 `
 
@@ -49,7 +73,8 @@ function renderTocHeadingLinks(node, tree) {
   const headingId = node.props?.["data-for"]
   if (typeof headingId === "string") {
     const content = renderedHeadingContent(tree, headingId)
-    if (content) return cloneElement(node, {}, content)
+    const label = typeof node.props?.children === "string" ? node.props.children : undefined
+    if (content) return cloneElement(node, label ? { title: label } : {}, content)
   }
 
   const children = childrenOf(node)
@@ -57,25 +82,36 @@ function renderTocHeadingLinks(node, tree) {
   return cloneElement(node, {}, ...children.map((child) => renderTocHeadingLinks(child, tree)))
 }
 
+export function visibleTocEntries(toc) {
+  if (!Array.isArray(toc) || toc.length <= 15) return toc
+  return toc.filter((entry) => Number(entry.depth) === 0)
+}
+
 export function TableOfContents(options) {
   const BaseTableOfContents = QuartzTableOfContents(options)
 
   const Component = (props) => {
-    const root = BaseTableOfContents(props)
+    const root = BaseTableOfContents({
+      ...props,
+      fileData: {
+        ...props.fileData,
+        collapseToc: false,
+        toc: visibleTocEntries(props.fileData?.toc),
+      },
+    })
     if (!root) return root
     if (root.type === "details") return renderTocHeadingLinks(root, props.tree)
 
     const [header, content] = childrenOf(root)
     const [title] = childrenOf(header)
-    const lucideHeader = cloneElement(
-      header,
-      {},
+    const staticHeader = h(
+      "div",
+      { class: "toc-static-header" },
       h(ListTree, lucideProps(16, "toc-title-icon")),
       title,
-      h(ChevronDown, lucideProps(24, "fold")),
     )
     const renderedContent = renderTocHeadingLinks(content, props.tree)
-    return cloneElement(root, {}, lucideHeader, renderedContent)
+    return cloneElement(root, {}, staticHeader, renderedContent)
   }
 
   Component.displayName = "TableOfContents"

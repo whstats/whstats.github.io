@@ -63,6 +63,7 @@ test("renders an accessible toolbar trigger and complete reading controls", () =
   assert.match(html, />Line spacing</)
   assert.match(html, />Reduce motion</)
   assert.match(html, />Keyboard shortcuts</)
+  assert.match(html, /1–9 mark or jump; press 0 twice to clear/)
   assert.match(html, />Restore defaults</)
   assert.equal(typeof Component.beforeDOMLoaded, "string")
   assert.equal(typeof Component.afterDOMLoaded, "string")

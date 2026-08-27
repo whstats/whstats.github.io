@@ -204,7 +204,7 @@ export function SiteSettings() {
               "span",
               null,
               h("strong", null, "Keyboard shortcuts"),
-              h("small", null, "H/N/F open reading tools."),
+              h("small", null, "H/N/F open tools. 1–9 mark or jump; press 0 twice to clear."),
             ),
             h("input", {
               type: "checkbox",

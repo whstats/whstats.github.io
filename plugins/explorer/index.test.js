@@ -11,7 +11,16 @@ test("matches the TOC visual hierarchy for the active page", () => {
   )
   assert.match(
     css,
+    /\.explorer-content \.folder-outer ul li > a,[\s\S]*?\.folder-outer \.folder-container div > button span \{[\s\S]*?font-size: 0\.9rem;/,
+  )
+  assert.match(
+    css,
     /\.explorer-content ul li > a,[\s\S]*?\.folder-container div > button \{[\s\S]*?font-family: var\(--bodyFont\);/,
+  )
+  assert.match(css, /\.explorer-content \.folder-container > div \{[\s\S]*?flex: 1;/)
+  assert.match(
+    css,
+    /\.explorer-content ul li > a,[\s\S]*?\.folder-container \.folder-title \{[\s\S]*?text-overflow: ellipsis;[\s\S]*?white-space: nowrap;/,
   )
   assert.match(
     css,

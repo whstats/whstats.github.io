@@ -319,7 +319,7 @@ body[data-slug="404"] .page[data-frame="minimal"] > #quartz-body {
 
   h2:not(.sr-only) {
     counter-increment: note-h2;
-    counter-reset: note-h3 note-h4 note-h5 note-h6;
+    counter-set: note-h3 0 note-h4 0 note-h5 0 note-h6 0;
     margin-top: var(--space-section);
     margin-bottom: var(--space-heading-after);
     font-size: var(--type-h2);
@@ -332,7 +332,7 @@ body[data-slug="404"] .page[data-frame="minimal"] > #quartz-body {
 
   h3:not(.sr-only) {
     counter-increment: note-h3;
-    counter-reset: note-h4 note-h5 note-h6;
+    counter-set: note-h4 0 note-h5 0 note-h6 0;
     margin-top: var(--space-subsection);
     margin-bottom: var(--space-heading-after);
     font-size: var(--type-h3);
@@ -345,7 +345,7 @@ body[data-slug="404"] .page[data-frame="minimal"] > #quartz-body {
 
   h4:not(.sr-only) {
     counter-increment: note-h4;
-    counter-reset: note-h5 note-h6;
+    counter-set: note-h5 0 note-h6 0;
     margin-top: var(--space-heading);
     margin-bottom: var(--space-heading-after);
     font-size: var(--type-h4);
@@ -357,7 +357,7 @@ body[data-slug="404"] .page[data-frame="minimal"] > #quartz-body {
 
   h5:not(.sr-only) {
     counter-increment: note-h5;
-    counter-reset: note-h6;
+    counter-set: note-h6 0;
     margin-top: var(--space-heading);
     margin-bottom: var(--space-heading-after);
     font-size: var(--type-h5);
@@ -840,6 +840,48 @@ ul.toc-content.overflow > li > a.toc-current.toc-current {
   color: var(--secondary);
   opacity: 1;
   font-weight: 700;
+}
+
+// The desktop right sidebar scrolls as one column when its contents exceed the viewport.
+@media all and ($desktop) {
+  .page > #quartz-body > .sidebar.right {
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-color: var(--overflow-thumb) transparent;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+      width: 0.35rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--overflow-thumb);
+      border-radius: 999px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: var(--overflow-thumb-hover);
+    }
+
+    & > * {
+      flex-shrink: 0;
+    }
+
+    & > .toc {
+      max-height: none;
+      overflow-y: visible;
+    }
+
+    & > .toc > ul.toc-content.overflow,
+    & > .related-notes .related-notes__list {
+      max-height: none;
+      overflow-y: visible;
+    }
+  }
 }
 
 // The frame separator is redundant when no after-body components are shown.

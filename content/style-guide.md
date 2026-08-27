@@ -1,6 +1,6 @@
 ---
 title: Style Guide
-description: A visual reference for typography, links, mathematics, callouts, code, tables, media, and other elements used across the notebook.
+description: An authoring reference for typography, links, mathematics, callouts, code, tables, media, and metadata in notebook content files.
 aliases:
   - Visual Style Guide
   - Component Showcase
@@ -8,13 +8,14 @@ tags:
   - style-guide
   - demonstration
   - mathematics
+lang: en
 ---
 
-This page is a visual reference for the elements used throughout **Notes on Statistics**. It also acts as a regression test: typography, mathematical notation, long content, and semantic blocks should remain readable in both light and dark modes.
+This page shows the Markdown syntax and semantic blocks available to files under `content/`. Use it as an authoring reference for notes in Notes on Statistics.
 
 ## Heading hierarchy
 
-The page title above is the level-one heading. The sections on this page use level-two headings.
+The frontmatter title supplies the only level-one heading. Start body sections with level two and nest lower levels in order.
 
 ### Level three heading
 
@@ -36,7 +37,7 @@ Level six is the smallest heading in the hierarchy.
 
 This is ordinary body text. It can include _italic emphasis_, **strong emphasis**, _**strong italic emphasis**_, ~~deleted text~~, and ==highlighted text==. Superscripts such as $n^2$ and subscripts such as $X_i$ are best written as mathematics when they carry mathematical meaning.
 
-An [external link to the Quartz documentation](https://quartz.jzhao.xyz/) opens a resource outside this notebook. Internal links can point to [[topics/the-delta-method|The Delta Method]], [[topics/sub-gaussian-tail-bounds|Sub-Gaussian Tail Bounds]], or a heading such as [[reference/notation#Convergence|the convergence notation reference]].
+Use standard Markdown for an [external link to the Quartz documentation](https://quartz.jzhao.xyz/). Use wikilinks for a note such as [[topics/sub-gaussian-tail-bounds|Sub-Gaussian Tails]] or a generated page such as the [[topics|Topics index]]. A fragment link can point to [the wide-formula example](#deliberately-wide-formula) on the same page. Link labels should describe their destination.
 
 ## Monospace and code
 
@@ -46,7 +47,7 @@ An indented code block is also valid:
 
     estimate = sum(observations) / len(observations)
 
-A fenced block adds syntax highlighting:
+A fenced block with a language name adds syntax highlighting. Long lines scroll within the code block.
 
 ```python
 from statistics import fmean
@@ -59,6 +60,7 @@ def centered_mean(observations: list[float], center: float = 0.0) -> float:
 
 values = [1.2, 0.8, 1.1, 0.9]
 print(centered_mean(values, center=1.0))
+summary = {"estimator": "sample mean", "assumptions": ["independent", "identically distributed", "finite variance"], "variance": "sigma squared divided by n"}
 ```
 
 ## Lists and tasks
@@ -91,6 +93,8 @@ A task list can track editorial work:
 
 ## Semantic callouts
 
+Use callout types to state the role of a block. Add `+` after the type to make a callout collapsible and open by default. Use `-` when it should start collapsed.
+
 > [!definition] Sample mean
 > For observations $X_1,\ldots,X_n$, the **sample mean** is
 >
@@ -107,7 +111,7 @@ A task list can track editorial work:
 > \operatorname{Var}(\overline X_n)=\frac{\sigma^2}{n}.
 > $$
 
-> [!proof] Proof
+> [!proof]+ Proof
 > Linearity of expectation gives
 > $\mathbb E[\overline X_n]=n^{-1}\sum_{i=1}^n\mathbb E[X_i]=\mu$.
 > Independence makes the cross-covariances vanish, so
@@ -130,6 +134,10 @@ A task list can track editorial work:
 ## Mathematics
 
 Both common delimiter styles are supported. Inline mathematics can use $\mathbb E[X]=\mu$ or \(\operatorname{Var}(X)=\sigma^2\). Display mathematics can use double dollar signs:
+
+### Mathematics in a heading \(n^{-1/2}\)
+
+Use mathematics in a heading only when the notation is part of its name. It inherits the heading's type scale.
 
 $$
 \frac{\overline X_n-\mu}{\sigma/\sqrt n}
@@ -172,7 +180,7 @@ The image below uses descriptive alternative text. It also demonstrates how a wi
 
 ## Frontmatter and tags
 
-This page uses a title, description, aliases, and several tags in its YAML frontmatter. The source follows this pattern:
+This page uses a title, description, aliases, tags, and a language code in its YAML frontmatter. The source follows this pattern:
 
 ```yaml
 ---
@@ -184,12 +192,13 @@ tags:
   - style-guide
   - demonstration
   - mathematics
+lang: en
 ---
 ```
 
-The tags connect this page to generated tag indexes, while aliases provide alternative internal-link targets.
+The title and description supply page metadata. Tags connect the page to generated indexes, aliases provide alternative internal-link targets, and `lang` records the content language.
 
-## Footnotes
+## Footnote references
 
 A footnote keeps a qualification close to the text without interrupting the main argument.[^finite-variance] Multiple references can share the same compact visual treatment.[^quotation]
 

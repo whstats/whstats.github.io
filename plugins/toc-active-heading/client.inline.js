@@ -16,10 +16,15 @@
 
     if (links.length === 0 || headings.length === 0) return
 
-    const scrollPadding = Number.parseFloat(
+    const parsedScrollPadding = Number.parseFloat(
       getComputedStyle(document.documentElement).scrollPaddingTop,
     )
-    const readingLine = Number.isFinite(scrollPadding) ? scrollPadding : 0
+    const scrollPadding = Number.isFinite(parsedScrollPadding) ? parsedScrollPadding : 0
+    const activationLine = (heading) => {
+      const parsedScrollMargin = Number.parseFloat(getComputedStyle(heading).scrollMarginTop)
+      const scrollMargin = Number.isFinite(parsedScrollMargin) ? parsedScrollMargin : 0
+      return scrollPadding + scrollMargin
+    }
     const pageBottom = Math.ceil(window.scrollY + window.innerHeight)
     const atPageEnd = pageBottom >= document.documentElement.scrollHeight - 1
     let current = headings[0]
@@ -28,7 +33,7 @@
       current = headings[headings.length - 1]
     } else {
       for (const heading of headings) {
-        if (heading.getBoundingClientRect().top > readingLine + 1) break
+        if (heading.getBoundingClientRect().top > activationLine(heading) + 1) break
         current = heading
       }
     }

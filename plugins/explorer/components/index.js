@@ -16,10 +16,41 @@ const iconCss = `
   font-size: 1rem;
 }
 
+.explorer-content .folder-outer ul li > a,
+.explorer-content .folder-outer .folder-container div > a,
+.explorer-content .folder-outer .folder-container div > button span {
+  font-size: 0.9rem;
+}
+
 .explorer-content ul li > a,
 .explorer-content .folder-container div > a,
 .explorer-content .folder-container div > button {
   font-family: var(--bodyFont);
+}
+
+.explorer-content ul li,
+.explorer-content .folder-container,
+.explorer-content .folder-container > div {
+  min-width: 0;
+}
+
+.explorer-content .folder-container > div {
+  flex: 1;
+}
+
+.explorer-content ul li > a,
+.explorer-content .folder-container div > a,
+.explorer-content .folder-container div > button,
+.explorer-content .folder-container .folder-title {
+  display: block;
+  height: 1.5rem;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  line-height: 1.5rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .explorer-content ul li > a {
