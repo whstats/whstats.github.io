@@ -145,7 +145,7 @@ plugins:
     enabled: true
   - source: "@quartz-community/content-page"
     enabled: true
-  - source: "@quartz-community/folder-page"
+  - source: ./plugins/folder-page
     enabled: true
   - source: "@quartz-community/tag-page"
     enabled: true
@@ -202,7 +202,7 @@ plugins:
       position: left
       priority: 40
       group: toolbar
-  - source: "@quartz-community/breadcrumbs"
+  - source: ./plugins/breadcrumbs
     enabled: true
     layout:
       position: beforeBody

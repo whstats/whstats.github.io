@@ -13,7 +13,7 @@ const iconCss = `
 .explorer-content ul li > a,
 .explorer-content .folder-container div > a,
 .explorer-content .folder-container div > button span {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .explorer-content ul li > a,
@@ -24,6 +24,7 @@ const iconCss = `
 
 .explorer-content ul li > a {
   opacity: 0.35;
+  font-weight: 600;
   transition: 0.5s ease opacity, 0.3s ease color;
 }
 
@@ -35,7 +36,6 @@ const iconCss = `
 .explorer-content ul li > a.active {
   color: var(--secondary);
   opacity: 1;
-  font-weight: 700;
 }
 `
 

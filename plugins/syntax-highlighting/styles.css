@@ -1,25 +1,33 @@
 .clipboard-button {
   position: absolute;
-  right: 0;
+  top: calc(0.65rem + 0.225em);
+  right: 0.65rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0.3rem;
-  padding: 0.4rem;
+  width: 1em;
+  height: 1em;
+  margin: 0;
+  padding: 0;
   color: var(--gray);
-  background-color: var(--light);
-  border: 1px solid var(--dark);
-  border-radius: 5px;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: inherit;
+  line-height: 1;
   opacity: 0;
   transition:
     color 0.2s ease,
-    border-color 0.2s ease,
     opacity 0.2s ease;
 }
 
 .clipboard-button > .clipboard-icon {
-  width: 16px;
-  height: 16px;
+  display: block;
+  width: 1em;
+  height: 1em;
+  flex: none;
   fill: none;
   stroke: currentColor;
 }
@@ -30,7 +38,6 @@
 
 .clipboard-button.is-copied {
   color: var(--tertiary);
-  border-color: var(--tertiary);
 }
 
 .clipboard-button.is-copied > .clipboard-icon-copy {
@@ -44,13 +51,13 @@
 .clipboard-button:hover {
   cursor: pointer;
   color: var(--secondary);
-  border-color: var(--secondary);
 }
 
 .clipboard-button:focus-visible {
   opacity: 1;
   outline: 2px solid var(--secondary);
   outline-offset: 2px;
+  box-shadow: none;
 }
 
 pre:hover > .clipboard-button {

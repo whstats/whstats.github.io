@@ -11,6 +11,8 @@
   --citation-gold: color-mix(in srgb, #c27a16 78%, var(--dark));
   --overflow-thumb: color-mix(in srgb, var(--gray) 62%, transparent);
   --overflow-thumb-hover: color-mix(in srgb, var(--darkgray) 62%, transparent);
+  --three-line-rule-strong: color-mix(in srgb, var(--darkgray) 82%, var(--gray));
+  --three-line-rule-middle: color-mix(in srgb, var(--darkgray) 62%, var(--gray));
 
   // One editorial type system drives the complete reading surface. Interface
   // components use Quartz's system-font styling.
@@ -21,7 +23,7 @@
   --reading-font-times-new-roman: "Times New Roman", Times, ui-serif, serif;
   --reading-font-system:
     -apple-system-body, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --reading-body-font: var(--reading-font-ibm-plex-serif);
+  --reading-body-font: var(--reading-font-minion-pro);
   --reading-heading-font:
     "IBM Plex Sans", -apple-system-body, ui-sans-serif, -apple-system, system-ui, "Segoe UI",
     sans-serif;
@@ -50,8 +52,9 @@
   --space-heading-after: 0.75rem;
   --space-heading-number: 0.4em;
   --space-equation-inline: clamp(0.75rem, 2vw, 1.25rem);
-  --space-page-top: 3rem;
-  --space-breadcrumb-title: 3rem;
+  --space-page-top: 2rem;
+  --space-breadcrumb-title: 4rem;
+  --space-page-title-after: 3rem;
 }
 
 html,
@@ -108,6 +111,7 @@ body:not([data-slug="404"]) .page > #quartz-body .center > .page-header {
 
   .article-title {
     margin-top: 0;
+    margin-bottom: var(--space-page-title-after);
   }
 }
 
@@ -222,6 +226,7 @@ body[data-slug="404"] .page[data-frame="minimal"] > #quartz-body {
 :is(
     .center > article,
     .center > .popover-hint > article,
+    .center > .popover-hint > .page-listing,
     .popover-inner[data-content-type^="text/html"] article
   )
   > *,
@@ -288,6 +293,27 @@ body[data-slug="404"] .page[data-frame="minimal"] > #quartz-body {
       margin-right: var(--space-heading-number);
       color: var(--gray);
       font-variant-numeric: tabular-nums;
+    }
+
+    > a[role="anchor"] {
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 0 0 0.45em;
+      padding: 0.16em;
+      border-radius: 0.3em;
+      font-size: clamp(0.75rem, 0.7em, 1.125rem);
+      line-height: 1;
+      vertical-align: 0;
+      transform: none;
+
+      > .heading-anchor-icon {
+        display: block;
+        width: 1em;
+        height: 1em;
+        flex: none;
+      }
     }
   }
 
@@ -590,6 +616,18 @@ a.external {
   font-size: var(--type-math);
 }
 
+// Let math embedded in headings follow the heading's own type scale instead
+// of being reduced to the body-math size above.
+:is(
+    .center > article,
+    .center > .popover-hint > article,
+    .popover-inner[data-content-type^="text/html"] article
+  )
+  :is(h1, h2, h3, h4, h5, h6)
+  .katex {
+  font-size: 1em;
+}
+
 :is(
     .center > article,
     .center > .popover-hint > article,
@@ -657,6 +695,7 @@ a.external {
 :is(
     .center > article,
     .center > .popover-hint > article,
+    .center > .popover-hint > .page-listing,
     .popover-inner[data-content-type^="text/html"] article
   )
   .table-container {
@@ -669,8 +708,8 @@ a.external {
     margin: 0;
     padding: 0;
     border-collapse: collapse;
-    border-top: 2px solid color-mix(in srgb, var(--darkgray) 82%, var(--gray));
-    border-bottom: 2px solid color-mix(in srgb, var(--darkgray) 82%, var(--gray));
+    border-top: 2px solid var(--three-line-rule-strong);
+    border-bottom: 2px solid var(--three-line-rule-strong);
     background: transparent;
     font-family: var(--reading-body-font);
     font-size: var(--type-table);
@@ -688,7 +727,7 @@ a.external {
       font-size: 1em;
       font-weight: 600;
       letter-spacing: 0.01em;
-      border-bottom: 1px solid color-mix(in srgb, var(--darkgray) 62%, var(--gray));
+      border-bottom: 1px solid var(--three-line-rule-middle);
     }
 
     tbody {
@@ -699,6 +738,71 @@ a.external {
       td {
         border: 0;
       }
+    }
+  }
+}
+
+.center > .popover-hint > .page-listing {
+  > p {
+    margin: 0 0 0.75rem;
+    color: color-mix(in srgb, var(--darkgray) 78%, var(--gray));
+    font-size: var(--type-caption);
+    line-height: var(--leading-compact);
+  }
+
+  > div {
+    min-width: 0;
+  }
+
+  .folder-table {
+    max-width: 100%;
+
+    > table {
+      table-layout: fixed;
+    }
+
+    :is(th, td) {
+      box-sizing: border-box;
+    }
+
+    :is(th, td).folder-table__date {
+      width: 8.5rem;
+      white-space: nowrap;
+    }
+
+    :is(th, td).folder-table__tags {
+      width: 16rem;
+    }
+
+    .folder-table__note h3 {
+      margin: 0;
+      font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
+    }
+
+    .folder-table__note a {
+      padding: 0;
+      background: transparent;
+      border-radius: 0;
+    }
+
+    .folder-table__tags > ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.28rem 0.5rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .folder-table__tags li {
+      margin: 0;
+      line-height: var(--leading-compact);
+    }
+
+    .folder-table__tags a {
+      overflow-wrap: anywhere;
     }
   }
 }

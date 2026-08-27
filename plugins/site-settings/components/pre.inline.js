@@ -31,7 +31,7 @@
     const lineHeight = lineHeights.has(storedLineHeight) ? storedLineHeight : "1.7"
     const fontFamily = Object.hasOwn(fontFamilies, stored.fontFamily)
       ? stored.fontFamily
-      : "ibm-plex-serif"
+      : "minion-pro"
     const root = document.documentElement
 
     root.style.setProperty("--reading-body-font", fontFamilies[fontFamily])

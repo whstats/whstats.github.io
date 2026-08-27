@@ -46,10 +46,10 @@
   justify-content: center;
   box-sizing: border-box;
   padding: 0;
-  border: 1px solid var(--lightgray);
+  border: 0;
   border-radius: 0.55rem;
   background: var(--light);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+  box-shadow: none;
   color: var(--darkgray);
   font-size: 0.84rem;
   font-weight: 560;

@@ -12,7 +12,7 @@ const LINE_HEIGHTS = new Set(["1.55", "1.7", "1.78"])
 const FONT_FAMILIES = new Set(["ibm-plex-serif", "minion-pro", "times-new-roman", "system"])
 
 export const DEFAULT_SETTINGS = Object.freeze({
-  fontFamily: "ibm-plex-serif",
+  fontFamily: "minion-pro",
   fontSize: 100,
   measure: "44rem",
   lineHeight: "1.7",

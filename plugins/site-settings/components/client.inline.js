@@ -2,7 +2,7 @@
   const storageKey = "notes:reading-settings:v2"
   const legacyStorageKey = "notes:reading-settings:v1"
   const defaults = Object.freeze({
-    fontFamily: "ibm-plex-serif",
+    fontFamily: "minion-pro",
     fontSize: 100,
     measure: "44rem",
     lineHeight: "1.7",

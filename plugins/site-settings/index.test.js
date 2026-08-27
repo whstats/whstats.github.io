@@ -5,6 +5,7 @@ import { DEFAULT_SETTINGS, SiteSettings, normalizeSettings } from "./index.js"
 
 test("normalizes stored settings into supported ranges and choices", () => {
   assert.deepEqual(normalizeSettings(), DEFAULT_SETTINGS)
+  assert.equal(DEFAULT_SETTINGS.fontFamily, "minion-pro")
   assert.equal(DEFAULT_SETTINGS.fontSize, 100)
   assert.deepEqual(
     normalizeSettings({
@@ -15,7 +16,7 @@ test("normalizes stored settings into supported ranges and choices", () => {
       reduceMotion: "yes",
     }),
     {
-      fontFamily: "ibm-plex-serif",
+      fontFamily: "minion-pro",
       fontSize: 120,
       measure: "44rem",
       lineHeight: "1.7",

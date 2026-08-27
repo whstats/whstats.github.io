@@ -1,133 +1,110 @@
 ---
 title: Sub-Gaussian Tail Bounds
-description: A compact guide to moment-generating-function control, Chernoff bounds, and concentration for independent sums.
+description: An intuitive introduction to sub-Gaussian tails through large deviations, sample means, and high-dimensional maxima.
 tags:
   - probability
   - concentration
   - high-dimensional-statistics
 ---
 
-## Core Insight
+The origin of the sub-Gaussian tail can be understood through a concrete question.
 
-A centered random variable is sub-Gaussian when its moment-generating function is no larger than that of a Gaussian at every scale. Through Chernoff's method, this comparison produces Gaussian-shaped tail decay: deviations of size $t$ cost roughly $e^{-t^2/(2\sigma^2)}$.
-
-The parameter $\sigma^2$ is a **variance proxy**, not necessarily the actual variance. It controls concentration and, under the definition below, satisfies $\operatorname{Var}(X)\leq \sigma^2$.
-
-## Logic Map
+Given a random variable $X$, we want to control the large-deviation event
 
 $$
-\text{MGF control}
-\longrightarrow \text{exponential Markov inequality}
-\longrightarrow \text{optimize the tilt}
-\longrightarrow \text{Gaussian tail bound}.
+\Pr(|X-\mathbb EX|>t).
 $$
 
-1. Center the variable so the MGF measures fluctuations rather than its mean.
-2. Exponentiate the bad event and apply Markov's inequality.
-3. Balance the linear penalty $-\lambda t$ against the quadratic MGF cost $\sigma^2\lambda^2/2$.
-4. Apply the same argument to $-X$, then use a union bound for a two-sided statement.
-
-## Setup
-
-> [!definition] Sub-Gaussian random variable
-> For $\sigma>0$, a random variable $X$ with $\mathbb E X=0$ is **$\sigma^2$-sub-Gaussian** if, for every $\lambda\in\mathbb R$,
->
-> $$
-> \mathbb E e^{\lambda X}\leq \exp\!\left(\frac{\sigma^2\lambda^2}{2}\right).
-> $$
-
-For an uncentered variable $Y$, the intended condition is on $Y-\mathbb EY$. Writing the definition directly for $Y$ is generally false unless its mean is zero.
-
-If independent centered variables $X_1,\ldots,X_n$ have variance proxies $\sigma_1^2,\ldots,\sigma_n^2$, then the weighted sum $S=\sum_{i=1}^n a_iX_i$ has variance proxy
+The normal distribution provides the classical example of a rapidly decaying tail. If $Z\sim N(0,\sigma^2)$, then
 
 $$
-v^2=\sum_{i=1}^n a_i^2\sigma_i^2.
+\Pr(|Z|>t)\lesssim \exp\!\left(-\frac{t^2}{2\sigma^2}\right).
 $$
 
-This closure property is why the squared scale, rather than the scale itself, is the natural bookkeeping quantity.
-
-## Main Result
-
-> [!theorem] Sub-Gaussian concentration
-> If $X$ is centered and $\sigma^2$-sub-Gaussian, then for every $t\geq 0$,
->
-> $$
-> \mathbb P(X\geq t)\leq e^{-t^2/(2\sigma^2)},
-> \qquad
-> \mathbb P(|X|\geq t)\leq 2e^{-t^2/(2\sigma^2)}.
-> $$
->
-> More generally, for independent centered $X_i$ as above,
->
-> $$
-> \mathbb P\!\left(\left|\sum_{i=1}^n a_iX_i\right|\geq t\right)
-> \leq 2\exp\!\left(-\frac{t^2}{2\sum_{i=1}^n a_i^2\sigma_i^2}\right).
-> $$
-
-In particular, if the $X_i$ share proxy $\sigma^2$, then
+Random variables with the same type of quadratic exponential decay,
 
 $$
-\mathbb P\!\left(\left|\frac1n\sum_{i=1}^n X_i\right|\geq t\right)
-\leq 2\exp\!\left(-\frac{nt^2}{2\sigma^2}\right).
+\boxed{\Pr(|X-\mathbb EX|>t)\le C e^{-c t^2}},
 $$
 
-## Proof Sketch
+are said to have a **sub-Gaussian tail**. What matters here is the rate at which the tail decays; $X$ itself does not need to follow a normal distribution. Many bounded random variables, including Bernoulli and Rademacher variables, are sub-Gaussian.
 
-For any $\lambda>0$, exponential Markov inequality gives
+Sub-Gaussian tails arise whenever we ask how far a random error can deviate from its mean.
 
-$$
-\mathbb P(X\geq t)
-=\mathbb P(e^{\lambda X}\geq e^{\lambda t})
-\leq e^{-\lambda t}\mathbb E e^{\lambda X}
-\leq \exp\!\left(-\lambda t+\frac{\sigma^2\lambda^2}{2}\right).
-$$
+## Sample Means: How Error Shrinks with Sample Size
 
-The exponent is minimized at $\lambda=t/\sigma^2$, producing $e^{-t^2/(2\sigma^2)}$. Since $-X$ has the same variance proxy, the lower-tail bound is identical; the union bound contributes the factor $2$ in the two-sided inequality.
-
-For a weighted independent sum, factorization of the MGF yields
+The sample mean is the most common example. If $X_1,\dots,X_n$ are independent and sub-Gaussian, then typically
 
 $$
-\mathbb E e^{\lambda\sum_i a_iX_i}
-=\prod_i \mathbb E e^{\lambda a_iX_i}
-\leq \exp\!\left(\frac{\lambda^2}{2}\sum_i a_i^2\sigma_i^2\right),
+\Pr\left(
+|\bar X-\mu|>t
+\right)
+\lesssim
+e^{-cnt^2}.
 $$
 
-so the same argument applies with proxy $\sum_i a_i^2\sigma_i^2$.
-
-## Example
-
-If $X\sim N(0,\tau^2)$, then
+Consequently,
 
 $$
-\mathbb E e^{\lambda X}=e^{\tau^2\lambda^2/2},
+|\bar X-\mu|
+=
+O_{\mathbb P}\left(\frac1{\sqrt n}\right).
 $$
 
-so $X$ is $\tau^2$-sub-Gaussian with equality in the MGF comparison.
-
-For a bounded variable $Y\in[a,b]$ almost surely, Hoeffding's lemma states
+More precisely, with probability at least $1-\delta$,
 
 $$
-\mathbb E e^{\lambda(Y-\mathbb EY)}
-\leq \exp\!\left(\frac{\lambda^2(b-a)^2}{8}\right).
+|\bar X-\mu|
+\lesssim
+\sqrt{\frac{\log(1/\delta)}{n}}.
 $$
 
-Thus $Y-\mathbb EY$ has variance proxy $(b-a)^2/4$. For independent $Y_i\in[a,b]$,
+This is why sub-Gaussian tails appear naturally in Hoeffding's inequality, Chernoff bounds, and concentration inequalities.
+
+## High-Dimensional Maxima: Why $\sqrt{\log p}$ Appears
+
+Another recurring setting is the maximum of many random errors in high-dimensional statistics. Suppose we estimate $p$ parameters simultaneously and the error in each coordinate is sub-Gaussian:
 
 $$
-\mathbb P\!\left(\left|\frac1n\sum_{i=1}^n(Y_i-\mathbb EY_i)\right|\geq t\right)
-\leq 2\exp\!\left(-\frac{2nt^2}{(b-a)^2}\right).
+\Pr(|X_j|>t)\lesssim e^{-ct^2}.
 $$
 
-## Connections
+By the union bound,
 
-- [[symmetrization-and-rademacher-complexity|Symmetrization & Rademacher Complexity]] reduces uniform empirical deviations to random signed sums, whose behavior is driven by the same concentration ideas.
-- [[m-estimation-consistency|M-Estimation Consistency]] often uses concentration to upgrade pointwise control of an objective into uniform control.
-- [[the-delta-method|The Delta Method]] describes asymptotic transformations after an estimator's stochastic fluctuations have been controlled.
+$$
+\Pr\left(\max_{1\le j\le p}|X_j|>t\right)
+\lesssim
+p e^{-ct^2}.
+$$
 
-## Pitfalls
+Choosing $t$ so that the right-hand side is small gives
 
-- **Forgetting centering.** Apply the definition and tail bound to $Y-\mathbb EY$, not automatically to $Y$.
-- **Dropping the two-sided factor.** A one-sided tail has no leading $2$; bounding $|X|$ by two one-sided events introduces it.
-- **Equating proxy and variance.** The proxy may be strictly larger than $\operatorname{Var}(X)$; it is an MGF-control parameter.
-- **Ignoring independence.** The simple sum rule uses MGF factorization and therefore independence.
-- **Mixing conventions.** Some authors call $\sigma$, rather than $\sigma^2$, the sub-Gaussian parameter. Always inspect the defining MGF inequality.
+$$
+\boxed{\max_j |X_j|\sim \sqrt{\log p}}.
+$$
+
+This explains why the rate
+
+$$
+\sqrt{\frac{\log p}{n}}
+$$
+
+appears repeatedly in the Lasso, multiple testing, random matrix theory, and high-dimensional regression: its probabilistic origin is often a sub-Gaussian tail bound.
+
+## The Main Thread
+
+The central idea is
+
+$$
+\boxed{
+\text{Gaussian }e^{-t^2}\text{ tails}
+\;\longrightarrow\;
+\text{the sub-Gaussian class}
+\;\longrightarrow\;
+\text{control of random sums, sample means, and high-dimensional maxima}
+}.
+$$
+
+## What Comes Next
+
+The next question worth understanding is: **Why does an MGF condition automatically imply an $e^{-ct^2}$ tail?** The answer is the Chernoff method, which is the technical engine behind sub-Gaussian theory.

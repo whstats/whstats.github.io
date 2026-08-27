@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@quartz-community/table-of-contents": "^0.1.0",
+    "@quartz-community/utils": "^0.1.0",
     "lucide-preact": "^1.34.0"
   },
   "quartz": {

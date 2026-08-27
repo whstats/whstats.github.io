@@ -1,0 +1,30 @@
+{
+  "name": "@notes-on-statistics/folder-page",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./components": "./components/index.js"
+  },
+  "peerDependencies": {
+    "preact": "^10.0.0"
+  },
+  "dependencies": {
+    "@quartz-community/folder-page": "^0.1.0"
+  },
+  "quartz": {
+    "name": "folder-page",
+    "displayName": "Folder Page",
+    "description": "Folder pages with title-cased generated names and a three-line notes table.",
+    "category": "pageType",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "defaultEnabled": true,
+    "defaultOrder": 50,
+    "defaultOptions": {
+      "showFolderCount": true,
+      "showSubfolders": true
+    }
+  }
+}

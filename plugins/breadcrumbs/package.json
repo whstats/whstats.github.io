@@ -1,0 +1,38 @@
+{
+  "name": "@notes-on-statistics/breadcrumbs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./components": "./components/index.js"
+  },
+  "peerDependencies": {
+    "preact": "^10.0.0"
+  },
+  "dependencies": {
+    "@quartz-community/breadcrumbs": "^0.1.0"
+  },
+  "quartz": {
+    "name": "breadcrumbs",
+    "displayName": "Breadcrumbs",
+    "description": "Quartz breadcrumbs that resolve generated folder-page titles.",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "defaultEnabled": true,
+    "defaultOptions": {
+      "spacerSymbol": "❯",
+      "rootName": "Home",
+      "resolveFrontmatterTitle": true,
+      "showCurrentPage": true
+    },
+    "components": {
+      "Breadcrumbs": {
+        "displayName": "Breadcrumbs",
+        "defaultPosition": "beforeBody",
+        "defaultPriority": 5
+      }
+    }
+  }
+}
