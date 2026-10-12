@@ -87,7 +87,8 @@
     }
 
     .callout-content {
-      & > * {
+      & > *,
+      & > .math-source[data-math-display="true"] > * {
         transition:
           height 0.1s cubic-bezier(0.02, 0.01, 0.47, 1),
           margin 0.1s cubic-bezier(0.02, 0.01, 0.47, 1),

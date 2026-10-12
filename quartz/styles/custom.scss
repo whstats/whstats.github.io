@@ -1,5 +1,37 @@
 @use "./variables.scss" as *;
 
+@font-face {
+  font-family: "XCharter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/static/fonts/xcharter/XCharter-Roman.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "XCharter";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/static/fonts/xcharter/XCharter-Italic.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "XCharter";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/static/fonts/xcharter/XCharter-Bold.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "XCharter";
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/static/fonts/xcharter/XCharter-BoldItalic.otf") format("opentype");
+}
+
 // Quartz's native three-column frame owns layout. This layer defines the
 // reading surface, mathematical content, and accessibility details.
 :root {
@@ -21,16 +53,19 @@
   --reading-font-minion-pro:
     "Minion Pro", Minion, "Adobe Garamond Pro", "Iowan Old Style", Georgia, ui-serif, serif;
   --reading-font-times-new-roman: "Times New Roman", Times, ui-serif, serif;
+  --reading-font-xcharter:
+    "XCharter", Charter, "Bitstream Charter", "Iowan Old Style", Georgia, ui-serif, serif;
   --reading-font-system:
     -apple-system-body, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --reading-body-font: var(--reading-font-minion-pro);
+  --reading-body-font: var(--reading-font-xcharter);
   --reading-heading-font:
     "IBM Plex Sans", -apple-system-body, ui-sans-serif, -apple-system, system-ui, "Segoe UI",
     sans-serif;
-  --type-body-base: 1.1rem;
+  --type-body-base: 1.155rem;
   --reader-font-scale: 1;
   --reading-font-size: calc(var(--type-body-base) * var(--reader-font-scale));
   --reading-line-height: 1.7;
+  --reading-text-align: justify;
   --reading-measure: 44rem;
   --type-page-title: calc(var(--reading-font-size) * 1.875);
   --type-meta: calc(var(--reading-font-size) * 0.875);
@@ -46,6 +81,7 @@
   --type-math: calc(var(--reading-font-size) * 1.1);
   --leading-heading: 1.2;
   --leading-compact: 1.45;
+  --space-paragraph: 1em;
   --space-section: 2.5rem;
   --space-subsection: 2rem;
   --space-heading: 1.5rem;
@@ -113,6 +149,20 @@ body:not([data-slug="404"]) .page > #quartz-body .center > .page-header {
     margin-top: 0;
     margin-bottom: var(--space-page-title-after);
   }
+
+  // Date and reading time belong to the title, so they sit directly beneath it.
+  .article-title:has(~ .content-meta) {
+    margin-bottom: 0.35rem;
+  }
+
+  .content-meta {
+    margin-bottom: 0.75rem;
+  }
+}
+
+// Section numbers help navigate long notes; the homepage reads better without them.
+body[data-slug="index"] .center > article :is(h2, h3, h4, h5, h6):not(.sr-only)::before {
+  content: none;
 }
 
 body:not([data-slug="404"]) .center > article,
@@ -253,6 +303,31 @@ body[data-slug="404"] .page[data-frame="minimal"] > #quartz-body {
   blockquote:not(.callout),
   .callout-content {
     line-height: var(--reading-line-height);
+  }
+
+  p {
+    margin-block: 0 var(--space-paragraph);
+  }
+
+  :where(p, li, blockquote:not(.callout), .callout-content > p) {
+    text-align: var(--reading-text-align);
+    text-justify: auto;
+    word-break: normal;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    hyphenate-limit-chars: 6 3 3;
+  }
+
+  // Justified text opens wide word gaps in a phone-width column.
+  @media (max-width: 600px) {
+    :where(p, li, blockquote:not(.callout), .callout-content > p) {
+      text-align: start;
+    }
+  }
+
+  :where(code, kbd, samp) {
+    -webkit-hyphens: none;
+    hyphens: none;
   }
 
   strong {
@@ -765,13 +840,33 @@ a.external {
       box-sizing: border-box;
     }
 
-    :is(th, td).folder-table__date {
-      width: 8.5rem;
-      white-space: nowrap;
+    :is(th, td).folder-table__tags {
+      width: 13rem;
     }
 
-    :is(th, td).folder-table__tags {
-      width: 16rem;
+    .folder-table__description {
+      margin: 0.3rem 0 0;
+      color: color-mix(in srgb, var(--darkgray) 88%, var(--gray));
+      font-size: var(--type-caption);
+      line-height: var(--leading-compact);
+      text-align: start;
+    }
+
+    .folder-table__meta {
+      margin: 0.3rem 0 0;
+      color: color-mix(in srgb, var(--darkgray) 70%, var(--gray));
+      font-size: var(--type-meta);
+    }
+
+    .folder-table__more {
+      color: color-mix(in srgb, var(--darkgray) 70%, var(--gray));
+      font-size: var(--type-meta);
+    }
+
+    @media (max-width: 600px) {
+      :is(th, td).folder-table__tags {
+        display: none;
+      }
     }
 
     .folder-table__note h3 {
@@ -937,5 +1032,27 @@ footer:empty {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+}
+
+// On phones the toolbar shares one row with the site title: keep the title on a
+// single line and let search collapse to its icon (the label returns on wider screens).
+@media #{$mobile} {
+  .page > #quartz-body .left .page-title {
+    min-width: 0;
+    flex: 1 1 auto;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .page > #quartz-body .left .search > .search-button {
+    width: auto;
+    padding-inline: 0.5rem;
+
+    > p {
+      display: none;
+    }
   }
 }

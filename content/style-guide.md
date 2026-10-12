@@ -9,6 +9,7 @@ tags:
   - demonstration
   - mathematics
 lang: en
+unlisted: true
 ---
 
 This page shows the Markdown syntax and semantic blocks available to files under `content/`. Use it as an authoring reference for notes in Notes on Statistics.

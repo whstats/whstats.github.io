@@ -8,5 +8,5 @@ test("exposes the search shortcut to assistive technology", () => {
   const html = renderToString(Component({ cfg: { locale: "en-US" } }))
 
   assert.match(html, /class="search-button"/)
-  assert.match(html, /aria-keyshortcuts="f"/)
+  assert.match(html, /aria-keyshortcuts="f \/"/)
 })

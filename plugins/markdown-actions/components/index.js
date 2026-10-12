@@ -1,54 +1,14 @@
-import { existsSync, realpathSync, statSync } from "node:fs"
 import { readFileSync } from "node:fs"
-import path from "node:path"
 import { h } from "preact"
 import { Copy, Download } from "lucide-preact"
 import { lucideProps } from "../../_shared/lucide.js"
+import { publicSourcePath, safeSlugSegments } from "../paths.js"
 
 const componentCss = readFileSync(new URL("./styles.css", import.meta.url), "utf8")
 const componentScript = readFileSync(new URL("./client.inline.js", import.meta.url), "utf8")
 
 function classNames(...values) {
   return values.filter(Boolean).join(" ")
-}
-
-function safeSlugSegments(slug) {
-  if (typeof slug !== "string" || slug.length === 0 || slug.includes("\\") || slug.includes("\0")) {
-    return null
-  }
-
-  const segments = slug.split("/")
-  return segments.some((segment) => segment.length === 0 || segment === "." || segment === "..")
-    ? null
-    : segments
-}
-
-function isInside(root, candidate) {
-  const relative = path.relative(root, candidate)
-  return (
-    relative === "" ||
-    (!relative.startsWith(`..${path.sep}`) && relative !== ".." && !path.isAbsolute(relative))
-  )
-}
-
-function hasPublicSource(ctx, fileData) {
-  const filePath = fileData?.filePath
-  const contentDirectory = ctx?.argv?.directory
-  if (
-    typeof filePath !== "string" ||
-    typeof contentDirectory !== "string" ||
-    !existsSync(filePath)
-  ) {
-    return false
-  }
-
-  try {
-    const realRoot = realpathSync(path.resolve(contentDirectory))
-    const realSource = realpathSync(path.resolve(filePath))
-    return isInside(realRoot, realSource) && statSync(realSource).isFile()
-  } catch {
-    return false
-  }
 }
 
 export function markdownSourceHref(slug) {
@@ -74,7 +34,7 @@ export function markdownDownloadName(relativePath, slug) {
 export function MarkdownActions() {
   const Component = ({ ctx, fileData, displayClass }) => {
     const sourceUrl = markdownSourceHref(fileData?.slug)
-    if (!sourceUrl || !hasPublicSource(ctx, fileData)) return null
+    if (!sourceUrl || !publicSourcePath(ctx.argv.directory, fileData.filePath)) return null
 
     const downloadName = markdownDownloadName(fileData.relativePath, fileData.slug)
     return h(

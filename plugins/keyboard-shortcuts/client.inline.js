@@ -16,7 +16,19 @@
     h: ".readermode",
     n: ".darkmode",
     f: ".search-button",
+    "/": ".search-button",
   }
+  const helpKey = "?"
+  const toastDuration = 2600
+  const helpRows = [
+    ["F or /", "Search notes"],
+    ["N", "Toggle dark mode"],
+    ["H", "Toggle reader mode"],
+    ["Select text, then 1–9", "Bookmark the selection"],
+    ["1–9", "Jump to that bookmark"],
+    ["0 0", "Clear all bookmarks"],
+    ["?", "Show or hide this list"],
+  ]
   const bookmarks = new Map()
   let markerLayer = null
   let statusRegion = null
@@ -25,6 +37,9 @@
   let observedArticle = null
   let clearConfirmation = null
   let clearConfirmationTimer = 0
+  let toast = null
+  let toastTimer = 0
+  let helpOverlay = null
 
   const shortcutsEnabled = () =>
     document.documentElement.getAttribute("data-keyboard-shortcuts") !== "false"
@@ -55,6 +70,24 @@
     ensureStatusRegion().textContent = message
   }
 
+  const dismissToast = () => {
+    if (toastTimer !== 0) window.clearTimeout(toastTimer)
+    toastTimer = 0
+    toast?.remove()
+    toast = null
+  }
+
+  const showToast = (badge, message) => {
+    dismissToast()
+    toast = document.createElement("div")
+    toast.className = "temporary-bookmark-toast"
+    toast.setAttribute("aria-hidden", "true")
+    toast.dataset.badge = badge
+    toast.textContent = message
+    document.body.append(toast)
+    toastTimer = window.setTimeout(dismissToast, toastDuration)
+  }
+
   const dismissClearConfirmation = () => {
     if (clearConfirmationTimer !== 0) window.clearTimeout(clearConfirmationTimer)
     clearConfirmationTimer = 0
@@ -64,6 +97,7 @@
 
   const showClearConfirmation = () => {
     dismissClearConfirmation()
+    dismissToast()
     clearConfirmation = document.createElement("div")
     clearConfirmation.className = "temporary-bookmark-clear-confirmation"
     clearConfirmation.setAttribute("aria-hidden", "true")
@@ -161,6 +195,7 @@
     markerLayer?.remove()
     markerLayer = null
     if (removeStatus) {
+      dismissToast()
       statusRegion?.remove()
       statusRegion = null
     }
@@ -201,6 +236,7 @@
     syncHighlight()
     selection.removeAllRanges()
     updateMarkers()
+    showToast(key, `Bookmark ${key} set. Press ${key} to return here; it lasts until you leave the page.`)
     announce(`Temporary bookmark ${key} set.`)
   }
 
@@ -232,6 +268,7 @@
         return true
       }
       clearBookmarks()
+      showToast("0", "Bookmarks cleared")
       announce("Temporary bookmarks cleared.")
       return true
     }
@@ -251,18 +288,84 @@
     return true
   }
 
-  const syncShortcutAttributes = () => {
+  const keysBySelector = () => {
+    const grouped = new Map()
     for (const [key, selector] of Object.entries(shortcutButtonSelectors)) {
+      grouped.set(selector, [...(grouped.get(selector) ?? []), key])
+    }
+    return grouped
+  }
+
+  // Tooltips name the key so the shortcuts can be discovered by hovering the toolbar.
+  const syncShortcutAttributes = () => {
+    for (const [selector, keys] of keysBySelector()) {
       for (const button of document.querySelectorAll(selector)) {
-        if (shortcutsEnabled()) button.setAttribute("aria-keyshortcuts", key)
-        else button.removeAttribute("aria-keyshortcuts")
+        if (button.dataset.shortcutBaseTitle === undefined) {
+          button.dataset.shortcutBaseTitle =
+            button.getAttribute("title") ?? button.getAttribute("aria-label") ?? ""
+        }
+        const baseTitle = button.dataset.shortcutBaseTitle
+        if (shortcutsEnabled()) {
+          button.setAttribute("aria-keyshortcuts", keys.join(" "))
+          const keyLabel = keys.map((key) => key.toUpperCase()).join(" or ")
+          button.setAttribute("title", baseTitle ? `${baseTitle} (${keyLabel})` : keyLabel)
+        } else {
+          button.removeAttribute("aria-keyshortcuts")
+          if (baseTitle) button.setAttribute("title", baseTitle)
+          else button.removeAttribute("title")
+        }
       }
     }
   }
 
+  const closeHelp = () => {
+    if (!helpOverlay) return false
+    helpOverlay.remove()
+    helpOverlay = null
+    return true
+  }
+
+  const openHelp = () => {
+    closeHelp()
+    helpOverlay = document.createElement("div")
+    helpOverlay.className = "keyboard-help"
+    helpOverlay.setAttribute("role", "dialog")
+    helpOverlay.setAttribute("aria-modal", "true")
+    helpOverlay.setAttribute("aria-label", "Keyboard shortcuts")
+
+    const panel = document.createElement("div")
+    panel.className = "keyboard-help__panel"
+    const title = document.createElement("h2")
+    title.textContent = "Keyboard shortcuts"
+    const list = document.createElement("dl")
+    for (const [keys, action] of helpRows) {
+      const term = document.createElement("dt")
+      term.textContent = keys
+      const detail = document.createElement("dd")
+      detail.textContent = action
+      list.append(term)
+      list.append(detail)
+    }
+    const note = document.createElement("p")
+    note.textContent =
+      "Bookmarks are temporary: they disappear when you reload or leave the page. Press Esc to close."
+    panel.append(title)
+    panel.append(list)
+    panel.append(note)
+    helpOverlay.append(panel)
+    helpOverlay.addEventListener?.("click", (event) => {
+      if (event.target === helpOverlay) closeHelp()
+    })
+    document.body.append(helpOverlay)
+    return true
+  }
+
   const handleShortcutSettingChange = () => {
     syncShortcutAttributes()
-    if (!shortcutsEnabled()) clearBookmarks()
+    if (!shortcutsEnabled()) {
+      closeHelp()
+      clearBookmarks({ removeStatus: true })
+    }
     else scheduleMarkerUpdate()
   }
 
@@ -270,6 +373,7 @@
 
   document.addEventListener("nav", syncShortcutAttributes)
   document.addEventListener("prenav", clearPageBookmarks)
+  document.addEventListener("prenav", closeHelp)
   document.addEventListener("render", clearPageBookmarks)
   document.addEventListener("render", syncShortcutAttributes)
   document.addEventListener("keyboardshortcutschange", handleShortcutSettingChange)
@@ -290,6 +394,17 @@
       isEditableElement(event.target) ||
       isEditableElement(document.activeElement)
     ) {
+      return
+    }
+
+    if (event.key === "Escape") {
+      if (closeHelp()) event.preventDefault()
+      return
+    }
+
+    if (event.key === helpKey) {
+      event.preventDefault()
+      if (!closeHelp()) openHelp()
       return
     }
 

@@ -14,15 +14,10 @@ export const defaultOptions = Object.freeze({
   emptyText: "No related notes yet.",
 })
 
-function normalizedSlug(value) {
-  if (typeof value !== "string" || value.length === 0) return null
-
-  try {
-    const simplified = simplifySlug(value)
-    return simplified === "/" ? simplified : simplified.replace(/\/+$/, "")
-  } catch {
-    return null
-  }
+// Quartz slugs and links are already slugified strings; only index pages need folding.
+function normalizedSlug(slug) {
+  const simplified = simplifySlug(slug)
+  return simplified === "/" ? simplified : simplified.replace(/\/+$/, "")
 }
 
 function compareText(left, right) {
@@ -34,41 +29,20 @@ function compareText(left, right) {
 
 function fallbackTitle(slug) {
   if (slug === "/") return "Home"
-
-  const finalSegment = slug.split("/").filter(Boolean).at(-1) ?? "Untitled note"
-  let decoded = finalSegment
-  try {
-    decoded = decodeURIComponent(finalSegment)
-  } catch {
-    // A malformed escape should not prevent the remaining links from rendering.
-  }
-
-  return decoded
+  return slug
+    .split("/")
+    .at(-1)
     .replace(/[-_]+/g, " ")
     .replace(/\b\p{L}/gu, (letter) => letter.toLocaleUpperCase("en"))
 }
 
 export function resolveNoteTitle(file) {
-  const candidates = [file?.frontmatter?.title, file?.title]
-  for (const candidate of candidates) {
-    if (typeof candidate === "string" && candidate.trim().length > 0) {
-      return candidate.trim()
-    }
-  }
-
-  return fallbackTitle(normalizedSlug(file?.slug) ?? "")
+  return file.frontmatter.title?.trim() || fallbackTitle(normalizedSlug(file.slug))
 }
 
+// Virtual tag/folder pages have no source `filePath`, so they never count as notes.
 export function isPublishedContentNote(file) {
-  return (
-    file !== null &&
-    typeof file === "object" &&
-    typeof file.slug === "string" &&
-    file.slug.length > 0 &&
-    typeof file.filePath === "string" &&
-    file.filePath.length > 0 &&
-    file.unlisted !== true
-  )
+  return Boolean(file.filePath) && file.unlisted !== true
 }
 
 function compareFiles(left, right) {
@@ -80,20 +54,17 @@ function compareFiles(left, right) {
 }
 
 /**
- * Index only real, published Markdown pages. Virtual tag/folder pages do not
- * have a source `filePath`, so they cannot appear as related notes. Sorting
- * before insertion makes duplicate simplified slugs resolve deterministically.
+ * Index only real, published Markdown pages. Sorting before insertion makes
+ * duplicate simplified slugs resolve deterministically.
  */
 export function indexPublishedNotes(allFiles = []) {
   const index = new Map()
-  const candidates = Array.isArray(allFiles)
-    ? allFiles.filter(isPublishedContentNote).sort(compareFiles)
-    : []
+  const candidates = allFiles.filter(isPublishedContentNote).sort(compareFiles)
 
   // Canonical slugs are registered first so an alias can never shadow a real page.
   for (const file of candidates) {
     const slug = normalizedSlug(file.slug)
-    if (slug !== null && !index.has(slug)) index.set(slug, file)
+    if (!index.has(slug)) index.set(slug, file)
   }
 
   for (const file of candidates) {
@@ -106,13 +77,11 @@ export function indexPublishedNotes(allFiles = []) {
 }
 
 function normalizedLinks(file) {
-  if (!Array.isArray(file?.links)) return new Set()
-  return new Set(file.links.map(normalizedSlug).filter((slug) => slug !== null))
+  return new Set((file.links ?? []).map(normalizedSlug))
 }
 
 function normalizedAliases(file) {
-  if (!Array.isArray(file?.aliases)) return new Set()
-  return new Set(file.aliases.map(normalizedSlug).filter((slug) => slug !== null))
+  return new Set((file.aliases ?? []).map(normalizedSlug))
 }
 
 function noteRelation(currentSlug, file) {
@@ -129,19 +98,17 @@ function compareRelations(left, right) {
 
 /** Select deduplicated incoming and outgoing published notes for one page. */
 export function selectRelatedNotes(fileData, allFiles = []) {
-  const currentSlug = normalizedSlug(fileData?.slug)
-  if (currentSlug === null) return { incoming: [], outgoing: [] }
-
+  const currentSlug = normalizedSlug(fileData.slug)
   const noteIndex = indexPublishedNotes(allFiles)
+  const currentIdentities = new Set([currentSlug, ...normalizedAliases(fileData)])
   const incoming = []
   const outgoing = []
-  const currentIdentities = new Set([currentSlug, ...normalizedAliases(fileData)])
   const seenIncoming = new Set()
   const seenOutgoing = new Set()
 
   for (const file of noteIndex.values()) {
     const slug = normalizedSlug(file.slug)
-    if (slug === null || slug === currentSlug || seenIncoming.has(slug)) continue
+    if (slug === currentSlug || seenIncoming.has(slug)) continue
     seenIncoming.add(slug)
     if ([...normalizedLinks(file)].some((link) => currentIdentities.has(link))) {
       incoming.push(noteRelation(fileData.slug, file))
@@ -150,16 +117,11 @@ export function selectRelatedNotes(fileData, allFiles = []) {
 
   for (const slug of normalizedLinks(fileData)) {
     const target = noteIndex.get(slug)
-    const targetSlug = normalizedSlug(target?.slug)
-    if (
-      target &&
-      targetSlug !== null &&
-      targetSlug !== currentSlug &&
-      !seenOutgoing.has(targetSlug)
-    ) {
-      seenOutgoing.add(targetSlug)
-      outgoing.push(noteRelation(fileData.slug, target))
-    }
+    if (!target) continue
+    const targetSlug = normalizedSlug(target.slug)
+    if (targetSlug === currentSlug || seenOutgoing.has(targetSlug)) continue
+    seenOutgoing.add(targetSlug)
+    outgoing.push(noteRelation(fileData.slug, target))
   }
 
   incoming.sort(compareRelations)

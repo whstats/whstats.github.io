@@ -1,6 +1,6 @@
 ---
 title: Notes on Statistics
-description: A public notebook on concentration, empirical-process tools, asymptotics, and estimation.
+description: A public notebook on concentration, information, regularization, and nonparametric estimation.
 ---
 
 A public notebook for a small set of ideas that recur across modern statistics. Each note begins with the controlling intuition, then makes the assumptions, result, and proof mechanism explicit.
@@ -10,18 +10,27 @@ A public notebook for a small set of ideas that recur across modern statistics. 
 
 ## Start here
 
-1. [[sub-gaussian-tail-bounds|Sub-Gaussian Tail Bounds]] — turn moment-generating-function control into exponentially small tail probabilities.
-2. [[symmetrization-and-rademacher-complexity|Symmetrization & Rademacher Complexity]] — move from one random quantity to uniform control over a function class.
-3. [[m-estimation-consistency|M-Estimation Consistency]] — convert a uniform law of large numbers and identification into consistency.
-4. [[the-delta-method|The Delta Method]] — transport a limiting distribution through a smooth transformation.
+**Probability and information** — the tools that control random error.
+
+1. [[sub-gaussian-tail-bounds|Sub-Gaussian Tails]] — turn moment-generating-function control into exponentially small tail probabilities.
+2. [[kullback_leibler_divergence|Kullback–Leibler Divergence]] — read divergence as expected log-likelihood evidence, with local Fisher geometry.
+
+**Regularization and approximation** — how to estimate when the model is large.
+
+3. [[penalized-regression|Penalized Regression]] — ridge, the lasso, and why restricted curvature yields high-dimensional error rates.
+4. [[b-splines-in-statistics|B-Splines in Statistics]] — local polynomial bases, spline-space geometry, and penalized smoothing.
+5. [[sieve-estimation|Sieve Estimation]] — balance approximation error against stochastic complexity as the model grows with the sample.
+
+**Function estimation** — structured models for unknown functions.
+
+6. [[additive-models|Additive Models]] — projection geometry, backfitting, and rates that escape the curse of dimensionality.
+7. [[gaussian-processes|Gaussian Processes]] — covariance kernels, conditioning, and RKHS geometry for Bayesian function estimation.
 
 ## What lives here
 
 The notes are concise rather than encyclopedic. Every page separates the core idea from the technical setup, states the assumptions next to the step that needs them, and records the common convention traps.
 
-- Browse all four entries in [[topics|Topics]].
-- Check symbols and convergence notation in [[notation|Notation]].
-- Read the scope and editorial principles on [[about|About]].
+Browse all seven notes, with summaries and reading times, in [[topics|Topics]].
 
 ## Status
 

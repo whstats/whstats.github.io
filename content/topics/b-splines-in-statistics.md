@@ -1,5 +1,6 @@
 ---
 title: "B-Splines in Statistics"
+order: 4
 description: From local approximation and spline-space geometry to regression splines, penalized estimation, probability bounds, and statistical applications.
 tags:
   - statistics

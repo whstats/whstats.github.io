@@ -60,9 +60,10 @@ class FakeArticle extends FakeElement {
 }
 
 class FakeButton extends FakeElement {
-  constructor(onClick) {
+  constructor(onClick, label) {
     super({ connected: true })
     this.onClick = onClick
+    if (label) this.setAttribute("aria-label", label)
   }
 
   click() {
@@ -141,9 +142,9 @@ function shortcutHarness(script, { highlightsSupported = true, shortcutsEnabled 
   let searchClicks = 0
   let keyboardShortcutsEnabled = shortcutsEnabled
   const buttons = {
-    ".readermode": new FakeButton(() => readerModeClicks++),
-    ".darkmode": new FakeButton(() => darkModeClicks++),
-    ".search-button": new FakeButton(() => searchClicks++),
+    ".readermode": new FakeButton(() => readerModeClicks++, "Reader mode"),
+    ".darkmode": new FakeButton(() => darkModeClicks++, "Dark mode"),
+    ".search-button": new FakeButton(() => searchClicks++, "Search"),
   }
 
   class FakeHighlight {
@@ -314,6 +315,13 @@ function shortcutHarness(script, { highlightsSupported = true, shortcutsEnabled 
       keyboardShortcutsEnabled = enabled
       dispatchDocumentEvent("keyboardshortcutschange")
     },
+    buttonTitle(selector) {
+      return buttons[selector]?.getAttribute("title") ?? null
+    },
+    helpOpen: () => body.children.some((child) => child.className === "keyboard-help"),
+    toastText: () =>
+      body.children.find((child) => child.className === "temporary-bookmark-toast")?.textContent ??
+      null,
     shortcutAttribute(selector) {
       return buttons[selector]?.getAttribute("aria-keyshortcuts") ?? null
     },
@@ -581,7 +589,7 @@ test("shortcuts can be disabled and stop advertising inactive interface keys", (
 
   assert.equal(harness.shortcutAttribute(".readermode"), "h")
   assert.equal(harness.shortcutAttribute(".darkmode"), "n")
-  assert.equal(harness.shortcutAttribute(".search-button"), "f")
+  assert.equal(harness.shortcutAttribute(".search-button"), "f /")
 
   harness.setShortcutsEnabled(false)
   assert.equal(harness.keydown("h"), false)
@@ -597,4 +605,53 @@ test("installs only one global shortcut listener", () => {
   vm.runInNewContext(script, harness.context)
 
   assert.equal(harness.keydownListeners.length, 1)
+})
+
+test("/ also opens search, and toolbar tooltips name each shortcut", () => {
+  const script = KeyboardShortcuts().externalResources().js[0].script
+  const harness = shortcutHarness(script)
+
+  assert.equal(harness.keydown("/"), true)
+  assert.equal(harness.searchClicks(), 1)
+  assert.equal(harness.buttonTitle(".search-button"), "Search (F or /)")
+  assert.equal(harness.buttonTitle(".darkmode"), "Dark mode (N)")
+  assert.equal(harness.buttonTitle(".readermode"), "Reader mode (H)")
+
+  harness.setShortcutsEnabled(false)
+  assert.equal(harness.buttonTitle(".search-button"), "Search")
+})
+
+test("? toggles a shortcut reference that Escape also closes", () => {
+  const script = KeyboardShortcuts().externalResources().js[0].script
+  const harness = shortcutHarness(script)
+
+  assert.equal(harness.keydown("?"), true)
+  assert.equal(harness.helpOpen(), true)
+  assert.equal(harness.keydown("?"), true)
+  assert.equal(harness.helpOpen(), false)
+
+  harness.keydown("?")
+  assert.equal(harness.keydown("Escape"), true)
+  assert.equal(harness.helpOpen(), false)
+  assert.equal(harness.keydown("Escape"), false)
+
+  harness.keydown("?")
+  harness.dispatchDocumentEvent("prenav")
+  assert.equal(harness.helpOpen(), false)
+})
+
+test("setting and clearing bookmarks shows a visible confirmation", () => {
+  const script = KeyboardShortcuts().externalResources().js[0].script
+  const harness = shortcutHarness(script)
+
+  harness.selectText()
+  harness.keydown("4")
+  assert.match(harness.toastText(), /^Bookmark 4 set\. Press 4 to return here/)
+  harness.advanceTime(2600)
+  assert.equal(harness.toastText(), null)
+
+  harness.keydown("0")
+  assert.equal(harness.toastText(), null)
+  harness.keydown("0")
+  assert.equal(harness.toastText(), "Bookmarks cleared")
 })

@@ -1,48 +1,11 @@
 import fs from "node:fs/promises"
 import path from "node:path"
+import { isInside, publicSourcePath, safeSlugSegments } from "./paths.js"
+
+export { safeSlugSegments }
 
 const ASSET_SEGMENTS = ["static", "markdown"]
 const MANIFEST_NAME = ".markdown-actions-manifest.json"
-
-export function safeSlugSegments(slug) {
-  if (typeof slug !== "string" || slug.length === 0 || slug.includes("\\") || slug.includes("\0")) {
-    return null
-  }
-
-  const segments = slug.split("/")
-  if (segments.some((segment) => segment.length === 0 || segment === "." || segment === "..")) {
-    return null
-  }
-
-  return segments
-}
-
-function isInside(root, candidate) {
-  const relative = path.relative(root, candidate)
-  return (
-    relative === "" ||
-    (!relative.startsWith(`..${path.sep}`) && relative !== ".." && !path.isAbsolute(relative))
-  )
-}
-
-async function resolvePublicSource(contentRoot, filePath) {
-  if (typeof filePath !== "string" || path.extname(filePath).toLowerCase() !== ".md") {
-    return null
-  }
-
-  try {
-    const [realRoot, realSource] = await Promise.all([
-      fs.realpath(path.resolve(contentRoot)),
-      fs.realpath(path.resolve(filePath)),
-    ])
-    if (!isInside(realRoot, realSource)) return null
-
-    const sourceStat = await fs.stat(realSource)
-    return sourceStat.isFile() ? realSource : null
-  } catch {
-    return null
-  }
-}
 
 function assetRelativePath(slug) {
   const segments = safeSlugSegments(slug)
@@ -72,16 +35,9 @@ async function removeStaleAssets(assetRoot, previousFiles, currentFiles) {
     previousFiles.map(async (relativePath) => {
       if (currentFiles.has(relativePath)) return
 
-      const segments = relativePath.split(/[\\/]/)
-      if (
-        segments.some((segment) => segment.length === 0 || segment === "." || segment === "..") ||
-        path.extname(relativePath).toLowerCase() !== ".md"
-      ) {
-        return
-      }
-
+      // The manifest is read back from disk, so bound deletions to Markdown inside the asset root.
       const candidate = path.resolve(assetRoot, relativePath)
-      if (!isInside(assetRoot, candidate)) return
+      if (path.extname(candidate).toLowerCase() !== ".md" || !isInside(assetRoot, candidate)) return
       await fs.unlink(candidate).catch((error) => {
         if (error?.code !== "ENOENT") throw error
       })
@@ -102,17 +58,14 @@ export async function emitMarkdownSources(ctx, content) {
   const currentFiles = new Set()
   const emittedFiles = []
 
-  for (const item of content) {
-    const file = item?.[1]
-    const slug = file?.data?.slug
-    const relativeAssetPath = assetRelativePath(slug)
+  for (const [, file] of content) {
+    const relativeAssetPath = assetRelativePath(file.data.slug)
     if (!relativeAssetPath) continue
 
-    const sourcePath = await resolvePublicSource(ctx.argv.directory, file?.data?.filePath)
+    const sourcePath = publicSourcePath(ctx.argv.directory, file.data.filePath)
     if (!sourcePath) continue
 
-    const outputPath = path.resolve(assetRoot, relativeAssetPath)
-    if (!isInside(assetRoot, outputPath)) continue
+    const outputPath = path.join(assetRoot, relativeAssetPath)
 
     const source = await fs.readFile(sourcePath)
     await fs.mkdir(path.dirname(outputPath), { recursive: true })

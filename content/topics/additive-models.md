@@ -1,5 +1,6 @@
 ---
 title: Additive Models
+order: 6
 description: A systematic account of the motivation, projection geometry, estimation, rates, generalized extensions, applications, and limitations of additive statistical models.
 aliases:
   - Additive Regression

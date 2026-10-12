@@ -1,5 +1,6 @@
 ---
 title: Sieve Estimation
+order: 5
 description: A systematic account of why sieve estimators arise, how approximation and stochastic complexity determine their behavior, and how the method operates in nonparametric and semiparametric statistics.
 aliases:
   - Method of Sieves

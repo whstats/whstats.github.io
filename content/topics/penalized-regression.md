@@ -1,5 +1,6 @@
 ---
 title: "Penalized Regression"
+order: 3
 description: A unified treatment of ridge regression, the lasso, regularized M-estimation, dual-norm control, restricted curvature, and structured high-dimensional error rates.
 tags:
   - statistics

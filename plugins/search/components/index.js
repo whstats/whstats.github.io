@@ -8,6 +8,24 @@ const iconCss = `
   color: var(--darkgray);
   transition: color 0.2s ease;
 }
+
+/* Keep the matching excerpt in the result list so body-only matches are distinguishable. */
+@media all and not (max-width: 800px) {
+  .search > .search-container > .search-space > .search-layout[data-preview] > .results-container {
+    flex-basis: min(38%, 480px);
+  }
+
+  .search > .search-container > .search-space > .search-layout[data-preview] .result-card > p.card-description {
+    display: -webkit-box;
+    margin: 0.3rem 0 0;
+    overflow: hidden;
+    color: var(--gray);
+    font-size: 0.8rem;
+    line-height: 1.4;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
 `
 
 export function Search(options) {
@@ -19,7 +37,7 @@ export function Search(options) {
     const [, label] = childrenOf(button)
     const lucideButton = cloneElement(
       button,
-      { "aria-keyshortcuts": "f" },
+      { "aria-keyshortcuts": "f /" },
       h(SearchIcon, lucideProps(18, "search-icon")),
       label,
     )

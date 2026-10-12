@@ -1,5 +1,6 @@
 ---
 title: "Sub-Gaussian Tails"
+order: 1
 description: Starting from the sample mean, understand sub-Gaussian tails, maxima, suprema, and unified random error control in high-dimensional statistics.
 tags:
   - probability

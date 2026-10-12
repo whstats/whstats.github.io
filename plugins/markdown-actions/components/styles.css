@@ -15,16 +15,19 @@
   align-items: start;
 }
 
-.center > .page-header > .popover-hint:has(> .markdown-actions) > .breadcrumb-container {
+/* Breadcrumbs, metadata, and summaries span the header; only the title shares its row. */
+.center > .page-header > .popover-hint:has(> .markdown-actions) > :not(.article-title, .markdown-actions) {
   grid-column: 1 / -1;
 }
 
 .center > .page-header > .popover-hint:has(> .markdown-actions) > .article-title {
+  grid-row: 2;
   grid-column: 1;
   min-width: 0;
 }
 
 .center > .page-header > .popover-hint:has(> .markdown-actions) > .markdown-actions {
+  grid-row: 2;
   grid-column: 2;
   align-self: start;
   margin-top: 0.16rem;
@@ -156,17 +159,5 @@
 @media (prefers-reduced-motion: reduce) {
   .markdown-actions-trigger {
     transition: none;
-  }
-}
-
-@media (max-width: 800px) {
-  .center > .page-header > .popover-hint:has(> .markdown-actions) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .center > .page-header > .popover-hint:has(> .markdown-actions) > .markdown-actions {
-    grid-column: 1;
-    justify-self: end;
-    margin-top: 0.6rem;
   }
 }

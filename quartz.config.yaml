@@ -19,7 +19,7 @@ configuration:
       code: Ubuntu Mono
     colors:
       lightMode:
-        light: "#faf8f8"
+        light: "#fefdfd"
         lightgray: "#e5e5e5"
         gray: "#b8b8b8"
         darkgray: "#464646"
@@ -106,6 +106,8 @@ plugins:
     order: 60
   - source: ./plugins/related-notes
     enabled: true
+    options:
+      hideWhenEmpty: true
     order: 65
     layout:
       position: right
@@ -171,10 +173,11 @@ plugins:
       position: beforeBody
       priority: 10
   - source: "@quartz-community/content-meta"
-    enabled: false
+    enabled: true
     layout:
       position: beforeBody
-      priority: 20
+      priority: 11
+      condition: not-index
   - source: "@quartz-community/tag-list"
     enabled: false
     layout:
@@ -203,6 +206,12 @@ plugins:
       position: left
       priority: 40
       group: toolbar
+  - source: ./plugins/reading-aids
+    enabled: true
+    layout:
+      position: beforeBody
+      priority: 12
+      condition: not-index
   - source: ./plugins/breadcrumbs
     enabled: true
     layout:

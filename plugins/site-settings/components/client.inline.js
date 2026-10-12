@@ -1,72 +1,14 @@
 ;(() => {
-  const storageKey = "notes:reading-settings:v2"
-  const legacyStorageKey = "notes:reading-settings:v1"
-  const defaults = Object.freeze({
-    fontFamily: "minion-pro",
-    fontSize: 100,
-    measure: "44rem",
-    lineHeight: "1.7",
-    reduceMotion: false,
-    keyboardShortcuts: true,
-  })
-  const measures = new Set(["44rem", "47rem", "50rem"])
-  const lineHeights = new Set(["1.55", "1.7", "1.78"])
-  const fontFamilies = Object.freeze({
-    "ibm-plex-serif": "var(--reading-font-ibm-plex-serif)",
-    "minion-pro": "var(--reading-font-minion-pro)",
-    "times-new-roman": "var(--reading-font-times-new-roman)",
-    system: "var(--reading-font-system)",
-  })
-
-  const clamp = (value, minimum, maximum, fallback) => {
-    const numeric = Number(value)
-    return Number.isFinite(numeric)
-      ? Math.min(maximum, Math.max(minimum, Math.round(numeric)))
-      : fallback
-  }
-
-  const normalize = (value = {}) => {
-    const storedLineHeight = value.lineHeight === "1.65" ? "1.7" : value.lineHeight
-    return {
-      fontFamily: Object.hasOwn(fontFamilies, value.fontFamily)
-        ? value.fontFamily
-        : defaults.fontFamily,
-      fontSize: clamp(value.fontSize, 95, 120, defaults.fontSize),
-      measure: measures.has(value.measure) ? value.measure : defaults.measure,
-      lineHeight: lineHeights.has(storedLineHeight) ? storedLineHeight : defaults.lineHeight,
-      reduceMotion: value.reduceMotion === true,
-      keyboardShortcuts: value.keyboardShortcuts !== false,
-    }
-  }
-
-  const migrateLegacy = (value) => {
-    const legacyFontSize = clamp(value.fontSize, 95, 120, 105)
-    return normalize({
-      ...value,
-      fontSize: Math.round((legacyFontSize / 105) * 100),
-    })
-  }
+  // `settingsCore` is injected ahead of this script (see settings-core.js).
+  const { storageKey, defaults, normalize, readStored, applyToRoot } = settingsCore
 
   const readSettings = () => {
-    try {
-      const stored = JSON.parse(window.localStorage.getItem(storageKey) ?? "null")
-      if (stored && typeof stored === "object") {
-        const normalized = normalize(stored)
-        if (JSON.stringify(stored) !== JSON.stringify(normalized)) {
-          window.localStorage.setItem(storageKey, JSON.stringify(normalized))
-        }
-        return normalized
-      }
+    const stored = readStored()
+    if (!stored) return { ...defaults }
 
-      const legacy = JSON.parse(window.localStorage.getItem(legacyStorageKey) ?? "null")
-      if (!legacy || typeof legacy !== "object") return { ...defaults }
-
-      const migrated = migrateLegacy(legacy)
-      window.localStorage.setItem(storageKey, JSON.stringify(migrated))
-      return migrated
-    } catch {
-      return { ...defaults }
-    }
+    const normalized = normalize(stored)
+    if (JSON.stringify(stored) !== JSON.stringify(normalized)) saveSettings(normalized)
+    return normalized
   }
 
   const saveSettings = (settings) => {
@@ -78,17 +20,7 @@
   }
 
   const applySettings = (settings) => {
-    const root = document.documentElement
-    root.style.setProperty("--reading-body-font", fontFamilies[settings.fontFamily])
-    root.style.setProperty(
-      "--reader-font-scale",
-      String(Number((settings.fontSize / 100).toFixed(2))),
-    )
-    root.style.setProperty("--reading-measure", settings.measure)
-    root.style.setProperty("--reading-line-height", settings.lineHeight)
-    root.toggleAttribute("data-reduce-motion", settings.reduceMotion)
-    if (settings.reduceMotion) root.setAttribute("data-reduce-motion", "true")
-    root.setAttribute("data-keyboard-shortcuts", String(settings.keyboardShortcuts))
+    applyToRoot(settings)
     document.dispatchEvent(
       new CustomEvent("keyboardshortcutschange", {
         detail: { enabled: settings.keyboardShortcuts },
@@ -113,6 +45,7 @@
       fontSize: root.querySelector('[data-settings-key="fontSize"]')?.value,
       measure: root.querySelector('[data-settings-key="measure"]')?.value,
       lineHeight: root.querySelector('[data-settings-key="lineHeight"]')?.value,
+      textAlign: root.querySelector('[data-settings-key="textAlign"]')?.value,
       reduceMotion: root.querySelector('[data-settings-key="reduceMotion"]')?.checked,
       keyboardShortcuts: root.querySelector('[data-settings-key="keyboardShortcuts"]')?.checked,
     })
@@ -158,7 +91,6 @@
       listen(reset, "click", () => {
         try {
           window.localStorage.removeItem(storageKey)
-          window.localStorage.removeItem(legacyStorageKey)
         } catch {
           // Reset still applies to the current page when storage is unavailable.
         }

@@ -2,44 +2,18 @@ import { readFileSync } from "node:fs"
 import { h } from "preact"
 import { SlidersHorizontal, X } from "lucide-preact"
 import { lucideProps } from "../../_shared/lucide.js"
+import { createSettingsCore, SETTINGS_SCHEMA, withSettingsCore } from "./settings-core.js"
 
 const componentCss = readFileSync(new URL("./styles.css", import.meta.url), "utf8")
-const beforeDOMLoaded = readFileSync(new URL("./pre.inline.js", import.meta.url), "utf8")
-const afterDOMLoaded = readFileSync(new URL("./client.inline.js", import.meta.url), "utf8")
+const inlineScript = (name) =>
+  withSettingsCore(readFileSync(new URL(name, import.meta.url), "utf8"))
+const beforeDOMLoaded = inlineScript("./pre.inline.js")
+const afterDOMLoaded = inlineScript("./client.inline.js")
 
-const MEASURES = new Set(["44rem", "47rem", "50rem"])
-const LINE_HEIGHTS = new Set(["1.55", "1.7", "1.78"])
-const FONT_FAMILIES = new Set(["ibm-plex-serif", "minion-pro", "times-new-roman", "system"])
+const { defaults, normalize } = createSettingsCore(SETTINGS_SCHEMA)
 
-export const DEFAULT_SETTINGS = Object.freeze({
-  fontFamily: "minion-pro",
-  fontSize: 100,
-  measure: "44rem",
-  lineHeight: "1.7",
-  reduceMotion: false,
-  keyboardShortcuts: true,
-})
-
-function clampInteger(value, minimum, maximum, fallback) {
-  const numeric = Number(value)
-  return Number.isFinite(numeric)
-    ? Math.min(maximum, Math.max(minimum, Math.round(numeric)))
-    : fallback
-}
-
-export function normalizeSettings(value = {}) {
-  const storedLineHeight = value.lineHeight === "1.65" ? "1.7" : value.lineHeight
-  return {
-    fontFamily: FONT_FAMILIES.has(value.fontFamily)
-      ? value.fontFamily
-      : DEFAULT_SETTINGS.fontFamily,
-    fontSize: clampInteger(value.fontSize, 95, 120, DEFAULT_SETTINGS.fontSize),
-    measure: MEASURES.has(value.measure) ? value.measure : DEFAULT_SETTINGS.measure,
-    lineHeight: LINE_HEIGHTS.has(storedLineHeight) ? storedLineHeight : DEFAULT_SETTINGS.lineHeight,
-    reduceMotion: value.reduceMotion === true,
-    keyboardShortcuts: value.keyboardShortcuts !== false,
-  }
-}
+export const DEFAULT_SETTINGS = Object.freeze({ ...defaults })
+export const normalizeSettings = normalize
 
 function classNames(...values) {
   return values.filter(Boolean).join(" ")
@@ -147,7 +121,8 @@ export function SiteSettings() {
             keyName: "fontFamily",
             options: [
               { label: "IBM Plex Serif", value: "ibm-plex-serif" },
-              { label: "Minion Pro", value: "minion-pro" },
+              { label: "Minion Pro (if installed)", value: "minion-pro" },
+              { label: "XCharter", value: "xcharter" },
               { label: "Times New Roman", value: "times-new-roman" },
               { label: "System", value: "system" },
             ],
@@ -182,6 +157,16 @@ export function SiteSettings() {
               { label: "Relaxed", value: "1.78" },
             ],
           }),
+          h(SelectSetting, {
+            id: "site-settings-text-align",
+            label: "Text alignment",
+            value: DEFAULT_SETTINGS.textAlign,
+            keyName: "textAlign",
+            options: [
+              { label: "Left", value: "left" },
+              { label: "Justified", value: "justify" },
+            ],
+          }),
           h(
             "label",
             { class: "site-settings-motion" },
@@ -204,7 +189,7 @@ export function SiteSettings() {
               "span",
               null,
               h("strong", null, "Keyboard shortcuts"),
-              h("small", null, "H/N/F open tools. 1–9 mark or jump; press 0 twice to clear."),
+              h("small", null, "Press ? on any page to see every shortcut."),
             ),
             h("input", {
               type: "checkbox",
