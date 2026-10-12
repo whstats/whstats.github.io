@@ -34,11 +34,9 @@
   let statusRegion = null
   let markerFrame = 0
   let articleObserver = null
-  let observedArticle = null
-  let clearConfirmation = null
-  let clearConfirmationTimer = 0
   let toast = null
   let toastTimer = 0
+  let clearArmed = false
   let helpOverlay = null
 
   const shortcutsEnabled = () =>
@@ -47,12 +45,21 @@
   const highlightsSupported = () =>
     typeof CSS !== "undefined" && CSS.highlights !== undefined && typeof Highlight !== "undefined"
 
-  const ensureMarkerLayer = () => {
-    if (markerLayer?.isConnected) return markerLayer
+  // The layer lives inside the article, so markers move with it when content above it
+  // changes height; only the article's own size changes need a repositioning pass.
+  const ensureMarkerLayer = (article) => {
+    if (markerLayer?.parentElement === article) return markerLayer
+    markerLayer?.remove()
     markerLayer = document.createElement("div")
     markerLayer.className = "temporary-bookmark-layer"
     markerLayer.setAttribute("aria-hidden", "true")
-    document.body.append(markerLayer)
+    article.append(markerLayer)
+    articleObserver?.disconnect()
+    articleObserver = null
+    if (typeof ResizeObserver !== "undefined") {
+      articleObserver = new ResizeObserver(scheduleMarkerUpdate)
+      articleObserver.observe(article)
+    }
     return markerLayer
   }
 
@@ -70,44 +77,34 @@
     ensureStatusRegion().textContent = message
   }
 
+  // Clearing is armed only while its countdown toast is on screen.
   const dismissToast = () => {
     if (toastTimer !== 0) window.clearTimeout(toastTimer)
     toastTimer = 0
     toast?.remove()
     toast = null
+    clearArmed = false
   }
 
-  const showToast = (badge, message) => {
+  const showToast = (badge, message, { duration = toastDuration, countdown = false } = {}) => {
     dismissToast()
     toast = document.createElement("div")
-    toast.className = "temporary-bookmark-toast"
+    toast.className = countdown
+      ? "temporary-bookmark-toast temporary-bookmark-toast--countdown"
+      : "temporary-bookmark-toast"
     toast.setAttribute("aria-hidden", "true")
     toast.dataset.badge = badge
     toast.textContent = message
     document.body.append(toast)
-    toastTimer = window.setTimeout(dismissToast, toastDuration)
+    toastTimer = window.setTimeout(dismissToast, duration)
   }
 
-  const dismissClearConfirmation = () => {
-    if (clearConfirmationTimer !== 0) window.clearTimeout(clearConfirmationTimer)
-    clearConfirmationTimer = 0
-    clearConfirmation?.remove()
-    clearConfirmation = null
-  }
-
-  const showClearConfirmation = () => {
-    dismissClearConfirmation()
-    dismissToast()
-    clearConfirmation = document.createElement("div")
-    clearConfirmation.className = "temporary-bookmark-clear-confirmation"
-    clearConfirmation.setAttribute("aria-hidden", "true")
-    clearConfirmation.textContent = "Press 0 again to clear bookmarks"
-    document.body.append(clearConfirmation)
-    clearConfirmationTimer = window.setTimeout(() => {
-      clearConfirmationTimer = 0
-      clearConfirmation?.remove()
-      clearConfirmation = null
-    }, clearConfirmationDuration)
+  const armClear = () => {
+    showToast("0", "Press 0 again to clear bookmarks", {
+      duration: clearConfirmationDuration,
+      countdown: true,
+    })
+    clearArmed = true
     announce("Press 0 again within 2 seconds to clear temporary bookmarks.")
   }
 
@@ -125,6 +122,8 @@
 
   const updateMarkers = () => {
     markerFrame = 0
+    const origin = markerLayer?.parentElement?.getBoundingClientRect()
+    if (!origin) return
     for (const { range, marker } of bookmarks.values()) {
       const rect = rangeBounds(range)
       if (!rect || (rect.width === 0 && rect.height === 0)) {
@@ -133,8 +132,8 @@
       }
 
       marker.hidden = false
-      marker.style.left = `${window.scrollX + rect.right}px`
-      marker.style.top = `${window.scrollY + rect.top}px`
+      marker.style.left = `${rect.right - origin.left}px`
+      marker.style.top = `${rect.top - origin.top}px`
     }
   }
 
@@ -154,18 +153,13 @@
     }
   }
 
-  const stopObservingArticle = () => {
+  const removeMarkerLayer = () => {
     articleObserver?.disconnect()
     articleObserver = null
-    observedArticle = null
-  }
-
-  const observeArticle = (article) => {
-    if (observedArticle === article || typeof ResizeObserver === "undefined") return
-    stopObservingArticle()
-    articleObserver = new ResizeObserver(scheduleMarkerUpdate)
-    articleObserver.observe(article)
-    observedArticle = article
+    if (markerFrame !== 0) window.cancelAnimationFrame(markerFrame)
+    markerFrame = 0
+    markerLayer?.remove()
+    markerLayer = null
   }
 
   const removeBookmark = (key) => {
@@ -175,31 +169,21 @@
     bookmarks.delete(key)
     syncHighlight()
     if (bookmarks.size === 0) {
-      dismissClearConfirmation()
-      stopObservingArticle()
-      markerLayer?.remove()
-      markerLayer = null
+      if (clearArmed) dismissToast()
+      removeMarkerLayer()
     }
     return true
   }
 
   const clearBookmarks = ({ removeStatus = false } = {}) => {
-    const hadBookmarks = bookmarks.size > 0
-    dismissClearConfirmation()
-    for (const { marker } of bookmarks.values()) marker.remove()
     bookmarks.clear()
-    if (highlightsSupported()) CSS.highlights.delete(bookmarkHighlightName)
-    stopObservingArticle()
-    if (markerFrame !== 0) window.cancelAnimationFrame(markerFrame)
-    markerFrame = 0
-    markerLayer?.remove()
-    markerLayer = null
+    syncHighlight()
+    removeMarkerLayer()
+    if (clearArmed || removeStatus) dismissToast()
     if (removeStatus) {
-      dismissToast()
       statusRegion?.remove()
       statusRegion = null
     }
-    return hadBookmarks
   }
 
   const currentSelection = () => {
@@ -230,13 +214,15 @@
     marker.className = "temporary-bookmark-marker"
     marker.dataset.bookmarkKey = key
     marker.textContent = key
-    ensureMarkerLayer().append(marker)
+    ensureMarkerLayer(article).append(marker)
     bookmarks.set(key, { marker, range })
-    observeArticle(article)
     syncHighlight()
     selection.removeAllRanges()
     updateMarkers()
-    showToast(key, `Bookmark ${key} set. Press ${key} to return here; it lasts until you leave the page.`)
+    showToast(
+      key,
+      `Bookmark ${key} set. Press ${key} to return here; it lasts until you leave the page.`,
+    )
     announce(`Temporary bookmark ${key} set.`)
   }
 
@@ -263,8 +249,8 @@
     if (event.key === "0") {
       if (bookmarks.size === 0) return true
       event.preventDefault()
-      if (clearConfirmationTimer === 0) {
-        showClearConfirmation()
+      if (!clearArmed) {
+        armClear()
         return true
       }
       clearBookmarks()
@@ -365,8 +351,7 @@
     if (!shortcutsEnabled()) {
       closeHelp()
       clearBookmarks({ removeStatus: true })
-    }
-    else scheduleMarkerUpdate()
+    } else scheduleMarkerUpdate()
   }
 
   const clearPageBookmarks = () => clearBookmarks({ removeStatus: true })
@@ -377,8 +362,6 @@
   document.addEventListener("render", clearPageBookmarks)
   document.addEventListener("render", syncShortcutAttributes)
   document.addEventListener("keyboardshortcutschange", handleShortcutSettingChange)
-  document.addEventListener("readermodechange", scheduleMarkerUpdate)
-  window.addEventListener("resize", scheduleMarkerUpdate)
   syncShortcutAttributes()
 
   document.addEventListener("keydown", (event) => {

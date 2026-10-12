@@ -52,6 +52,11 @@ class FakeArticle extends FakeElement {
   constructor() {
     super({ connected: true })
     this.containedNodes = new Set()
+    this.rect = { left: 0, top: 0 }
+  }
+
+  getBoundingClientRect() {
+    return this.rect
   }
 
   contains(node) {
@@ -130,6 +135,7 @@ function shortcutHarness(script, { highlightsSupported = true, shortcutsEnabled 
   const documentListeners = new Map()
   const windowListeners = new Map()
   const highlightRegistry = new Map()
+  const resizeObservers = []
   const selection = new FakeSelection()
   const article = new FakeArticle()
   const body = new FakeElement({ connected: true })
@@ -158,6 +164,8 @@ function shortcutHarness(script, { highlightsSupported = true, shortcutsEnabled 
       this.callback = callback
       this.disconnected = false
       this.observed = null
+      this.observedElements = []
+      resizeObservers.push(this)
     }
 
     disconnect() {
@@ -166,7 +174,8 @@ function shortcutHarness(script, { highlightsSupported = true, shortcutsEnabled 
     }
 
     observe(element) {
-      this.observed = element
+      this.observed ??= element
+      this.observedElements.push(element)
     }
   }
 
@@ -260,7 +269,7 @@ function shortcutHarness(script, { highlightsSupported = true, shortcutsEnabled 
     return prevented
   }
   const markerLayer = () =>
-    body.children.find((child) => child.className === "temporary-bookmark-layer") ?? null
+    article.children.find((child) => child.className === "temporary-bookmark-layer") ?? null
   const advanceTime = (milliseconds) => {
     const targetTime = timerClock + milliseconds
     while (true) {
@@ -297,7 +306,7 @@ function shortcutHarness(script, { highlightsSupported = true, shortcutsEnabled 
     body,
     context,
     confirmationText: () =>
-      body.children.find((child) => child.className === "temporary-bookmark-clear-confirmation")
+      body.children.find((child) => child.className.includes("temporary-bookmark-toast--countdown"))
         ?.textContent ?? null,
     darkModeClicks: () => darkModeClicks,
     dispatchDocumentEvent,
@@ -308,6 +317,7 @@ function shortcutHarness(script, { highlightsSupported = true, shortcutsEnabled 
       markerLayer()?.children.find((child) => child.dataset.bookmarkKey === key) ?? null,
     markerCount: () => markerLayer()?.children.length ?? 0,
     readerModeClicks: () => readerModeClicks,
+    resizeObservers,
     scrollCalls,
     selectText,
     selection,
@@ -329,9 +339,8 @@ function shortcutHarness(script, { highlightsSupported = true, shortcutsEnabled 
       body.children.find((child) => child.className === "temporary-bookmark-status")?.textContent ??
       null,
     searchClicks: () => searchClicks,
-    setScrollPosition({ x, y }) {
-      window.scrollX = x
-      window.scrollY = y
+    setArticlePosition({ left, top }) {
+      article.rect = { left, top }
     },
   }
 }
@@ -346,16 +355,9 @@ test("loads one global shortcut script and its temporary-bookmark styles", () =>
   assert.equal(resources.css[0].inline, true)
   assert.match(resources.css[0].content, /::highlight\(notes-temporary-bookmarks\)/)
   assert.match(resources.css[0].content, /temporary-bookmark-marker/)
-  assert.match(resources.css[0].content, /temporary-bookmark-clear-confirmation/)
-  assert.match(resources.css[0].content, /temporary-bookmark-confirmation-window 2s/)
-  assert.match(resources.css[0].content, /background: #d97706/)
-  assert.match(resources.css[0].content, /border: 0/)
-  assert.match(resources.css[0].content, /box-shadow: none/)
-  assert.match(
-    resources.css[0].content,
-    /::highlight\(notes-temporary-bookmarks\) \{\s*background: color-mix\(in srgb, var\(--tertiary\) 30%, transparent\);\s*\}/,
-  )
-  assert.doesNotMatch(resources.css[0].content, /text-decoration/)
+  assert.match(resources.css[0].content, /article:has\(> \.temporary-bookmark-layer\)/)
+  assert.match(resources.css[0].content, /temporary-bookmark-toast--countdown::after/)
+  assert.match(resources.css[0].content, /temporary-bookmark-countdown 2s/)
   assert.match(resources.js[0].script, /\.readermode/)
   assert.match(resources.js[0].script, /\.darkmode/)
   assert.match(resources.js[0].script, /\.search-button/)
@@ -395,23 +397,24 @@ test("digits 1-9 set independent highlighted bookmarks with numbered markers", (
   assert.equal(harness.statusText(), "Temporary bookmark 9 set.")
 })
 
-test("numbered markers use the selection's upper-right document coordinates", () => {
+test("numbered markers sit at the selection's upper-right corner, inside the article", () => {
   const script = KeyboardShortcuts().externalResources().js[0].script
   const harness = shortcutHarness(script)
 
-  harness.setScrollPosition({ x: 15, y: 240 })
+  harness.setArticlePosition({ left: 30, top: 160 })
   harness.selectText({ rect: { left: 100, top: 360, width: 90 } })
   harness.keydown("5")
 
-  assert.equal(harness.marker("5")?.style.left, "205px")
-  assert.equal(harness.marker("5")?.style.top, "600px")
+  assert.equal(harness.marker("5")?.parentElement.parentElement, harness.article)
+  assert.equal(harness.marker("5")?.style.left, "160px")
+  assert.equal(harness.marker("5")?.style.top, "200px")
 })
 
 test("fragmented formula selections use the complete selection's upper-right corner", () => {
   const script = KeyboardShortcuts().externalResources().js[0].script
   const harness = shortcutHarness(script)
 
-  harness.setScrollPosition({ x: 12, y: 180 })
+  harness.setArticlePosition({ left: 20, top: -100 })
   harness.selectText({
     rect: { height: 120, left: 100, top: 260, width: 240 },
     clientRects: [
@@ -422,8 +425,8 @@ test("fragmented formula selections use the complete selection's upper-right cor
   })
   harness.keydown("2")
 
-  assert.equal(harness.marker("2")?.style.left, "352px")
-  assert.equal(harness.marker("2")?.style.top, "440px")
+  assert.equal(harness.marker("2")?.style.left, "320px")
+  assert.equal(harness.marker("2")?.style.top, "360px")
 })
 
 test("an assigned digit jumps to its range when there is no selection", () => {
@@ -654,4 +657,22 @@ test("setting and clearing bookmarks shows a visible confirmation", () => {
   assert.equal(harness.toastText(), null)
   harness.keydown("0")
   assert.equal(harness.toastText(), "Bookmarks cleared")
+})
+
+test("only the article's own size is observed, and the observer stops with the last bookmark", () => {
+  const script = KeyboardShortcuts().externalResources().js[0].script
+  const harness = shortcutHarness(script)
+
+  harness.selectText()
+  harness.keydown("2")
+  harness.selectText()
+  harness.keydown("3")
+  assert.equal(harness.resizeObservers.length, 1)
+  const [observer] = harness.resizeObservers
+  assert.deepEqual(observer.observedElements, [harness.article])
+
+  harness.keydown("0")
+  harness.keydown("0")
+  assert.equal(observer.disconnected, true)
+  assert.equal(harness.article.children.length, 0)
 })
