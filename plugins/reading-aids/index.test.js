@@ -9,7 +9,10 @@ const render = (fileData) => renderToString(h(ReadingAids(), { fileData }))
 test("renders the frontmatter description as the page summary", () => {
   assert.equal(pageSummary({ frontmatter: { description: "  A note.  " } }), "A note.")
   assert.equal(pageSummary({ frontmatter: { description: "" } }), null)
-  assert.match(render({ frontmatter: { description: "A note." } }), /reading-aids__summary">A note\.</)
+  assert.match(
+    render({ frontmatter: { description: "A note." } }),
+    /reading-aids__summary">A note\.</,
+  )
 })
 
 test("renders nothing when there is neither a summary nor an outline", () => {
@@ -28,6 +31,12 @@ test("builds mobile contents and a back-to-top control from the outline", () => 
   assert.match(html, /2 sections/)
   assert.match(html, /<li class="depth-1"><a href="#detail" data-for="detail">Detail<\/a>/)
   assert.match(html, /aria-label="Back to top"[^>]*hidden/)
+  assert.match(html, /<p class="reading-aids__resume" hidden>/)
+  assert.match(html, /aria-label="Forget reading position"/)
+})
+
+test("omits the resume link on pages without an outline", () => {
+  assert.doesNotMatch(render({ frontmatter: { description: "A note." } }), /reading-aids__resume/)
 })
 
 test("collapses long outlines to top-level sections", () => {

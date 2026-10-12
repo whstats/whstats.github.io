@@ -116,3 +116,63 @@
     display: none;
   }
 }
+
+.reading-aids__resume {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.35rem 0.35rem 0.35rem 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--secondary) 35%, var(--lightgray));
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--secondary) 6%, var(--light));
+  font-family: var(--headerFont);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.reading-aids__resume[hidden] {
+  display: none;
+}
+
+.reading-aids__resume-link {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  background: transparent;
+  color: var(--secondary);
+}
+
+.reading-aids__resume-heading {
+  font-weight: 600;
+}
+
+.reading-aids__resume-dismiss {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.35rem;
+  background: transparent;
+  color: var(--gray);
+  cursor: pointer;
+}
+
+.reading-aids__resume-dismiss:hover,
+.reading-aids__resume-dismiss:focus-visible {
+  background: var(--highlight);
+  color: var(--dark);
+}
+
+@media print {
+  .reading-aids__resume {
+    display: none;
+  }
+}

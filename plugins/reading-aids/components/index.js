@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs"
 import { h } from "preact"
-import { ArrowUp, ChevronDown, ListTree } from "lucide-preact"
+import { ArrowRight, ArrowUp, ChevronDown, ListTree, X } from "lucide-preact"
 import { lucideProps } from "../../_shared/lucide.js"
 
 const componentCss = readFileSync(new URL("./styles.css", import.meta.url), "utf8")
@@ -43,6 +43,31 @@ function MobileContents({ entries }) {
   )
 }
 
+// Filled in by the client script when the reader has a saved position on this page.
+function ResumeLink() {
+  return h(
+    "p",
+    { class: "reading-aids__resume", hidden: true },
+    h(
+      "a",
+      { class: "reading-aids__resume-link", href: "#" },
+      h("span", null, "Continue from "),
+      h("span", { class: "reading-aids__resume-heading" }),
+      h(ArrowRight, lucideProps(16)),
+    ),
+    h(
+      "button",
+      {
+        type: "button",
+        class: "reading-aids__resume-dismiss",
+        "aria-label": "Forget reading position",
+        title: "Forget reading position",
+      },
+      h(X, lucideProps(16)),
+    ),
+  )
+}
+
 export function ReadingAids() {
   const Component = ({ fileData, displayClass }) => {
     const summary = pageSummary(fileData)
@@ -53,6 +78,7 @@ export function ReadingAids() {
       "div",
       { class: [displayClass, "reading-aids"].filter(Boolean).join(" ") },
       summary && h("p", { class: "reading-aids__summary" }, summary),
+      entries.length > 0 && h(ResumeLink),
       entries.length > 0 && h(MobileContents, { entries }),
       entries.length > 0 &&
         h(
