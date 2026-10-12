@@ -31,7 +31,8 @@
   const syncControls = (root, settings) => {
     for (const control of root.querySelectorAll("[data-settings-key]")) {
       const key = control.dataset.settingsKey
-      if (key === "reduceMotion" || key === "keyboardShortcuts") control.checked = settings[key]
+      if (control.type === "checkbox") control.checked = settings[key]
+      else if (control.type === "radio") control.checked = control.value === String(settings[key])
       else control.value = settings[key]
     }
 
@@ -39,16 +40,21 @@
     if (fontOutput) fontOutput.textContent = `${settings.fontSize}%`
   }
 
-  const settingsFromControls = (root) =>
-    normalize({
-      fontFamily: root.querySelector('[data-settings-key="fontFamily"]')?.value,
-      fontSize: root.querySelector('[data-settings-key="fontSize"]')?.value,
-      measure: root.querySelector('[data-settings-key="measure"]')?.value,
-      lineHeight: root.querySelector('[data-settings-key="lineHeight"]')?.value,
-      textAlign: root.querySelector('[data-settings-key="textAlign"]')?.value,
-      reduceMotion: root.querySelector('[data-settings-key="reduceMotion"]')?.checked,
-      keyboardShortcuts: root.querySelector('[data-settings-key="keyboardShortcuts"]')?.checked,
+  // Radio groups report their checked member; other controls report themselves.
+  const settingsFromControls = (root) => {
+    const value = (key) =>
+      root.querySelector(`[data-settings-key="${key}"]:is(:checked, :not([type="radio"]))`)?.value
+    const checked = (key) => root.querySelector(`[data-settings-key="${key}"]`)?.checked
+    return normalize({
+      fontFamily: value("fontFamily"),
+      fontSize: value("fontSize"),
+      measure: value("measure"),
+      lineHeight: value("lineHeight"),
+      textAlign: value("textAlign"),
+      reduceMotion: checked("reduceMotion"),
+      keyboardShortcuts: checked("keyboardShortcuts"),
     })
+  }
 
   const initializeSiteSettings = () => {
     const current = readSettings()

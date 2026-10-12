@@ -57,16 +57,15 @@ test("renders an accessible toolbar trigger and complete reading controls", () =
   assert.match(html, /class="desktop-only site-settings"/)
   assert.match(html, /aria-label="Reading settings"/)
   assert.match(html, /role="dialog"/)
-  assert.match(html, />Body font</)
-  assert.match(html, />Minion Pro \(if installed\)</)
+  for (const label of ["Typeface", "Text size", "Line length", "Line spacing", "Alignment"]) {
+    assert.match(html, new RegExp(`>${label}<`))
+  }
   assert.match(html, />XCharter</)
+  assert.match(html, />Minion Pro<\/span><small>if installed</)
   assert.match(html, />Times New Roman</)
   assert.match(html, />System</)
-  assert.match(html, />Body text</)
+  assert.match(html, /style="font-family: var\(--reading-font-ibm-plex-serif\)"/)
   assert.match(html, /data-settings-output="fontSize">100%</)
-  assert.match(html, />Reading width</)
-  assert.match(html, />Line spacing</)
-  assert.match(html, />Text alignment</)
   assert.match(html, />Left</)
   assert.match(html, />Justified</)
   assert.match(html, />Reduce motion</)
@@ -86,4 +85,18 @@ test("renders an accessible toolbar trigger and complete reading controls", () =
   assert.match(Component.afterDOMLoaded, /--reading-text-align/)
   assert.match(Component.afterDOMLoaded, /data-keyboard-shortcuts/)
   assert.match(Component.css, /site-settings-panel/)
+})
+
+test("choices are radio groups with the defaults pre-selected", () => {
+  const html = renderToString(SiteSettings()({}))
+  const checked = (key) =>
+    [...html.matchAll(new RegExp(`<input[^>]*data-settings-key="${key}"[^>]*>`, "g"))]
+      .filter(([tag]) => / checked/.test(tag))
+      .map(([tag]) => tag.match(/value="([^"]*)"/)[1])
+
+  assert.deepEqual(checked("fontFamily"), ["xcharter"])
+  assert.deepEqual(checked("measure"), ["44rem"])
+  assert.deepEqual(checked("lineHeight"), ["1.7"])
+  assert.deepEqual(checked("textAlign"), ["justify"])
+  assert.match(html, /type="radio" name="site-settings-measure"/)
 })

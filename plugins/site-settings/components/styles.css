@@ -1,12 +1,15 @@
+/* Reading settings: a quiet popover in the sidebar's vocabulary — header font,
+   hairline borders, small-caps labels, and the site's secondary blue for state. */
+
 .site-settings {
   position: relative;
   z-index: 60;
-  width: 20px;
-  height: 32px;
-  flex: 0 0 20px;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
   margin: 0;
   color: var(--darkgray);
-  font-family: var(--bodyFont);
+  font-family: var(--headerFont);
 }
 
 .site-settings > summary {
@@ -17,25 +20,20 @@
   display: none;
 }
 
+/* Matches the dark-mode and reader-mode buttons beside it. */
 .site-settings-trigger {
   display: grid;
   width: 20px;
   height: 32px;
   place-items: center;
-  box-sizing: border-box;
   padding: 0;
-  border: 0;
-  background: transparent;
   color: var(--darkgray);
   cursor: pointer;
 }
 
 .site-settings-trigger svg {
-  width: 20px;
-  height: 20px;
-  transition:
-    color 140ms ease,
-    transform 180ms ease;
+  stroke: currentColor;
+  transition: color 140ms ease;
 }
 
 .site-settings-trigger:hover,
@@ -43,8 +41,10 @@
   color: var(--secondary);
 }
 
-.site-settings[open] > .site-settings-trigger svg {
-  transform: translateY(-1px);
+.site-settings-trigger:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
 }
 
 .site-settings-scrim {
@@ -58,155 +58,244 @@
 
 .site-settings-panel {
   position: absolute;
-  top: calc(100% + 0.65rem);
+  top: calc(100% + 0.5rem);
   right: -0.75rem;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-auto-flow: row;
   width: min(17.5rem, calc(100vw - 2rem));
-  max-height: calc(100vh - 7rem);
+  /* The panel opens about 12rem down the sidebar; keep its bottom on screen. */
+  max-height: calc(100vh - 13rem);
   box-sizing: border-box;
-  padding: 1rem;
   overflow-y: auto;
-  border: 1px solid color-mix(in srgb, var(--gray) 42%, transparent);
-  border-radius: 0.9rem;
-  background: color-mix(in srgb, var(--light) 96%, var(--lightgray));
+  border: 1px solid var(--lightgray);
+  border-radius: 8px;
+  background: var(--light);
   box-shadow:
-    0 22px 55px rgb(22 27 29 / 16%),
-    0 2px 8px rgb(22 27 29 / 7%);
+    0 12px 32px rgb(0 0 0 / 10%),
+    0 1px 3px rgb(0 0 0 / 6%);
   color: var(--darkgray);
+  font-size: 0.8rem;
+  line-height: 1.35;
   scrollbar-width: thin;
 }
 
 .site-settings-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding-bottom: 0.85rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--lightgray) 82%, transparent);
+  padding: 0.7rem 0.6rem 0.55rem 1rem;
 }
 
 .site-settings-header h2 {
   margin: 0;
   color: var(--dark);
-  font-size: 1rem;
-  font-weight: 650;
-  line-height: 1.3;
-}
-
-.site-settings-header p {
-  margin: 0.2rem 0 0;
-  color: var(--gray);
-  font-size: 0.76rem;
-  line-height: 1.35;
+  font-size: 0.95rem;
+  font-weight: 700;
 }
 
 .site-settings-close {
   display: grid;
   width: 1.75rem;
   height: 1.75rem;
-  flex: 0 0 1.75rem;
   place-items: center;
   padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: 4px;
   background: transparent;
   color: var(--gray);
   cursor: pointer;
 }
 
-.site-settings-close:hover {
+.site-settings-close:hover,
+.site-settings-close:focus-visible {
   background: var(--highlight);
   color: var(--dark);
 }
 
-.site-settings-close svg {
-  width: 16px;
-  height: 16px;
-}
-
 .site-settings-fields {
   display: grid;
-  gap: 0.95rem;
-  padding: 0.95rem 0 0.9rem;
+  gap: 1.05rem;
+  padding: 0.25rem 1rem 1rem;
 }
 
-.site-settings-field {
+.site-settings-group {
   display: grid;
   gap: 0.45rem;
+  min-width: 0;
   margin: 0;
+  padding: 0;
+  border: 0;
 }
 
-.site-settings-field-heading {
+/* Same treatment as the "Links to this note" label in the right sidebar. */
+.site-settings-label {
+  padding: 0;
+  color: var(--gray);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.site-settings-label-row {
   display: flex;
-  min-height: 1.25rem;
   align-items: baseline;
   justify-content: space-between;
-  gap: 1rem;
-  color: var(--darkgray);
-  font-size: 0.82rem;
-  font-weight: 600;
-  line-height: 1.35;
 }
 
-.site-settings-field output {
-  color: var(--gray);
-  font-family: var(--codeFont);
-  font-size: 0.73rem;
+.site-settings-label-row output {
+  color: var(--darkgray);
+  font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
 }
 
-.site-settings-field input[type="range"] {
+/* Radios stay in the accessibility tree and keyboard order; their labels are the UI. */
+.site-settings-group input[type="radio"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+
+.site-settings-typefaces {
+  display: grid;
+  gap: 1px;
+}
+
+.site-settings-typeface {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  color: var(--darkgray);
+  font-size: 0.98rem;
+  cursor: pointer;
+}
+
+.site-settings-typeface small {
+  color: var(--gray);
+  font-family: var(--headerFont);
+  font-size: 0.68rem;
+}
+
+.site-settings-check {
+  align-self: center;
+  margin-left: auto;
+  color: var(--secondary);
+  visibility: hidden;
+}
+
+.site-settings-typeface:hover {
+  background: var(--highlight);
+}
+
+.site-settings-typeface:has(input:checked) {
+  background: color-mix(in srgb, var(--secondary) 9%, transparent);
+  color: var(--dark);
+}
+
+.site-settings-typeface:has(input:checked) .site-settings-check {
+  visibility: visible;
+}
+
+.site-settings-size {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--gray);
+  font-family: var(--reading-body-font);
+  line-height: 1;
+}
+
+.site-settings-size-small {
+  font-size: 0.8rem;
+}
+
+.site-settings-size-large {
+  font-size: 1.2rem;
+}
+
+.site-settings-size input[type="range"] {
   width: 100%;
-  height: 1rem;
   margin: 0;
   accent-color: var(--secondary);
   cursor: pointer;
 }
 
-.site-settings-field select {
-  width: 100%;
-  min-height: 2.1rem;
-  box-sizing: border-box;
-  padding: 0.35rem 2rem 0.35rem 0.55rem;
+.site-settings-segmented {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  padding: 2px;
   border: 1px solid var(--lightgray);
-  border-radius: 0.48rem;
-  background: var(--light);
+  border-radius: 6px;
+}
+
+.site-settings-segment > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-height: 1.7rem;
+  padding: 0 0.3rem;
+  border-radius: 4px;
   color: var(--darkgray);
-  font: inherit;
-  font-size: 0.8rem;
+  font-size: 0.74rem;
+  white-space: nowrap;
   cursor: pointer;
 }
 
-.site-settings-motion {
+.site-settings-segment:hover > span {
+  color: var(--dark);
+}
+
+.site-settings-segment input:checked + span {
+  background: color-mix(in srgb, var(--secondary) 12%, transparent);
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.site-settings-typeface:has(input:focus-visible),
+.site-settings-segment input:focus-visible + span {
+  outline: 2px solid var(--secondary);
+  outline-offset: -2px;
+}
+
+.site-settings-toggles {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.8rem 1rem;
+  border-top: 1px solid var(--lightgray);
+}
+
+.site-settings-toggle {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.2rem 1rem;
-  padding-top: 0.1rem;
+  gap: 1rem;
   cursor: pointer;
 }
 
-.site-settings-motion > span:first-child {
+.site-settings-toggle > span:first-child {
   display: grid;
-  gap: 0.12rem;
+  gap: 0.1rem;
 }
 
-.site-settings-motion strong {
+.site-settings-toggle strong {
   color: var(--darkgray);
-  font-size: 0.82rem;
   font-weight: 600;
-  line-height: 1.3;
 }
 
-.site-settings-motion small {
+.site-settings-toggle small {
   color: var(--gray);
-  font-size: 0.72rem;
-  line-height: 1.35;
+  font-size: 0.7rem;
 }
 
-.site-settings-motion input {
+.site-settings-toggle input {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -215,87 +304,81 @@
 
 .site-settings-switch {
   position: relative;
-  width: 2rem;
-  height: 1.1rem;
-  border: 1px solid var(--gray);
+  width: 1.75rem;
+  height: 1rem;
   border-radius: 999px;
   background: var(--lightgray);
-  transition:
-    border-color 140ms ease,
-    background-color 140ms ease;
+  transition: background-color 140ms ease;
 }
 
 .site-settings-switch::after {
   position: absolute;
-  top: 0.13rem;
-  left: 0.14rem;
-  width: 0.72rem;
-  height: 0.72rem;
+  top: 2px;
+  left: 2px;
+  width: calc(1rem - 4px);
+  height: calc(1rem - 4px);
   border-radius: 50%;
-  background: var(--darkgray);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 18%);
-  content: "";
-  transition:
-    background-color 140ms ease,
-    transform 140ms ease;
-}
-
-.site-settings-motion input:checked + .site-settings-switch {
-  border-color: var(--secondary);
-  background: color-mix(in srgb, var(--secondary) 72%, var(--light));
-}
-
-.site-settings-motion input:checked + .site-settings-switch::after {
   background: var(--light);
-  transform: translateX(0.88rem);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+  content: "";
+  transition: transform 140ms ease;
 }
 
-.site-settings-motion input:focus-visible + .site-settings-switch {
+.site-settings-toggle input:checked + .site-settings-switch {
+  background: var(--secondary);
+}
+
+.site-settings-toggle input:checked + .site-settings-switch::after {
+  transform: translateX(0.75rem);
+}
+
+.site-settings-toggle input:focus-visible + .site-settings-switch {
   outline: 2px solid var(--secondary);
-  outline-offset: 3px;
-}
-
-.site-settings-motion input:focus-visible {
-  outline: none;
-  box-shadow: none;
+  outline-offset: 2px;
 }
 
 .site-settings-footer {
   display: flex;
-  min-height: 1.6rem;
   align-items: center;
-  justify-content: space-between;
   gap: 0.8rem;
-  padding-top: 0.7rem;
-  border-top: 1px solid color-mix(in srgb, var(--lightgray) 82%, transparent);
+  padding: 0.6rem 1rem 0.7rem;
+  border-top: 1px solid var(--lightgray);
+  color: var(--gray);
+  font-size: 0.7rem;
+}
+
+/* A fresh "Saved" or "Defaults restored" replaces the standing note. */
+.site-settings-status:empty,
+.site-settings-status:not(:empty) + .site-settings-note {
+  display: none;
 }
 
 .site-settings-footer button {
+  margin-left: auto;
   padding: 0;
   border: 0;
   background: transparent;
   color: var(--secondary);
   font: inherit;
-  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
 }
 
 .site-settings-footer button:hover {
-  color: var(--tertiary);
   text-decoration: underline;
   text-underline-offset: 0.16em;
 }
 
-.site-settings-status {
-  color: var(--gray);
-  font-size: 0.7rem;
-  line-height: 1.3;
+/* The sidebar is its own stacking context (sticky, z-index 1), so an open panel must
+   lift the whole sidebar above the article's controls. */
+.page > #quartz-body .sidebar:has(.site-settings[open]) {
+  z-index: 90;
 }
 
 @media (max-width: 800px) {
+  /* Above the sidebar's explorer toggle (z-index 101). */
   .site-settings[open] {
-    z-index: 80;
+    z-index: 110;
   }
 
   .site-settings-scrim {
@@ -307,19 +390,17 @@
     height: 100dvh;
     padding: 0;
     border: 0;
-    background: rgb(18 22 24 / 28%);
-    backdrop-filter: blur(2px);
+    background: rgb(0 0 0 / 28%);
     cursor: default;
   }
 
   .site-settings-panel {
     position: fixed;
     z-index: 81;
-    inset: auto 1rem 1rem;
+    inset: auto 0.75rem 0.75rem;
     width: auto;
-    max-height: calc(100dvh - 2rem);
-    border-radius: 1rem;
-    background: var(--light);
+    max-height: calc(100dvh - 1.5rem);
+    border-radius: 10px;
   }
 }
 

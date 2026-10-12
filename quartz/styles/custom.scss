@@ -1035,6 +1035,13 @@ footer:empty {
   }
 }
 
+// Toolbar icon buttons are inline-block by default, which seats them on the text
+// baseline 2px above the search box and settings trigger; center them as blocks.
+.page > #quartz-body .left :is(.darkmode, .readermode) {
+  display: grid;
+  place-items: center;
+}
+
 // On phones the toolbar shares one row with the site title: keep the title on a
 // single line and let search collapse to its icon (the label returns on wider screens).
 @media #{$mobile} {

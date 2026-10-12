@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs"
 import { h } from "preact"
-import { SlidersHorizontal, X } from "lucide-preact"
+import { ALargeSmall, Check, TextAlignJustify, TextAlignStart, X } from "lucide-preact"
 import { lucideProps } from "../../_shared/lucide.js"
 import { createSettingsCore, SETTINGS_SCHEMA, withSettingsCore } from "./settings-core.js"
 
@@ -15,44 +15,110 @@ const { defaults, normalize } = createSettingsCore(SETTINGS_SCHEMA)
 export const DEFAULT_SETTINGS = Object.freeze({ ...defaults })
 export const normalizeSettings = normalize
 
+const TYPEFACES = [
+  { label: "XCharter", value: "xcharter" },
+  { label: "IBM Plex Serif", value: "ibm-plex-serif" },
+  { label: "Minion Pro", value: "minion-pro", note: "if installed" },
+  { label: "Times New Roman", value: "times-new-roman" },
+  { label: "System", value: "system" },
+]
+
 function classNames(...values) {
   return values.filter(Boolean).join(" ")
 }
 
-function RangeSetting({ id, label, minimum, maximum, value, keyName }) {
+function radio(keyName, value) {
+  return h("input", {
+    type: "radio",
+    name: `site-settings-${keyName}`,
+    value,
+    checked: String(DEFAULT_SETTINGS[keyName]) === value,
+    "data-settings-key": keyName,
+  })
+}
+
+// Each typeface is named in its own face, so the choice is visible before it is made.
+function TypefaceSetting() {
   return h(
-    "div",
-    { class: "site-settings-field" },
+    "fieldset",
+    { class: "site-settings-group" },
+    h("legend", { class: "site-settings-label" }, "Typeface"),
     h(
       "div",
-      { class: "site-settings-field-heading" },
-      h("label", { for: id }, label),
-      h("output", { for: id, "data-settings-output": keyName }, `${value}%`),
+      { class: "site-settings-typefaces" },
+      TYPEFACES.map(({ label, value, note }) =>
+        h(
+          "label",
+          {
+            class: "site-settings-typeface",
+            style: `font-family: ${SETTINGS_SCHEMA.fontFamilies[value]}`,
+          },
+          radio("fontFamily", value),
+          h("span", { class: "site-settings-typeface-name" }, label),
+          note && h("small", null, note),
+          h(Check, lucideProps(15, "site-settings-check")),
+        ),
+      ),
     ),
-    h("input", {
-      id,
-      type: "range",
-      min: minimum,
-      max: maximum,
-      step: 1,
-      value,
-      "data-settings-key": keyName,
-    }),
   )
 }
 
-function SelectSetting({ id, label, value, keyName, options }) {
+function SizeSetting() {
+  const id = "site-settings-font-size"
   return h(
-    "label",
-    { class: "site-settings-field", for: id },
-    h("span", { class: "site-settings-field-heading" }, h("span", null, label)),
+    "div",
+    { class: "site-settings-group" },
     h(
-      "select",
-      { id, value, "data-settings-key": keyName },
-      options.map(({ label: optionLabel, value: optionValue }) =>
-        h("option", { value: optionValue }, optionLabel),
+      "div",
+      { class: "site-settings-label-row" },
+      h("label", { class: "site-settings-label", for: id }, "Text size"),
+      h("output", { for: id, "data-settings-output": "fontSize" }, `${DEFAULT_SETTINGS.fontSize}%`),
+    ),
+    h(
+      "div",
+      { class: "site-settings-size" },
+      h("span", { class: "site-settings-size-small", "aria-hidden": "true" }, "A"),
+      h("input", {
+        id,
+        type: "range",
+        min: 95,
+        max: 120,
+        step: 1,
+        value: DEFAULT_SETTINGS.fontSize,
+        "data-settings-key": "fontSize",
+      }),
+      h("span", { class: "site-settings-size-large", "aria-hidden": "true" }, "A"),
+    ),
+  )
+}
+
+function ChoiceSetting({ label, keyName, options }) {
+  return h(
+    "fieldset",
+    { class: "site-settings-group" },
+    h("legend", { class: "site-settings-label" }, label),
+    h(
+      "div",
+      { class: "site-settings-segmented" },
+      options.map(({ label: optionLabel, value, icon }) =>
+        h(
+          "label",
+          { class: "site-settings-segment" },
+          radio(keyName, value),
+          h("span", null, icon && h(icon, lucideProps(15)), optionLabel),
+        ),
       ),
     ),
+  )
+}
+
+function ToggleSetting({ keyName, label, description }) {
+  return h(
+    "label",
+    { class: "site-settings-toggle" },
+    h("span", null, h("strong", null, label), h("small", null, description)),
+    h("input", { type: "checkbox", "data-settings-key": keyName }),
+    h("span", { class: "site-settings-switch", "aria-hidden": "true" }),
   )
 }
 
@@ -72,7 +138,7 @@ export function SiteSettings() {
           "aria-expanded": "false",
           "aria-haspopup": "dialog",
         },
-        h(SlidersHorizontal, lucideProps(20, "site-settings-icon")),
+        h(ALargeSmall, lucideProps(20, "site-settings-icon")),
       ),
       h("button", {
         class: "site-settings-scrim",
@@ -89,17 +155,11 @@ export function SiteSettings() {
           role: "dialog",
           "aria-modal": "false",
           "aria-labelledby": "site-settings-title",
-          "aria-describedby": "site-settings-description",
         },
         h(
-          "header",
+          "div",
           { class: "site-settings-header" },
-          h(
-            "div",
-            null,
-            h("h2", { id: "site-settings-title" }, "Reading settings"),
-            h("p", { id: "site-settings-description" }, "Saved only in this browser."),
-          ),
+          h("h2", { id: "site-settings-title" }, "Reading settings"),
           h(
             "button",
             {
@@ -108,37 +168,16 @@ export function SiteSettings() {
               "aria-label": "Close reading settings",
               "data-settings-close": "",
             },
-            h(X, lucideProps(20, "site-settings-close-icon")),
+            h(X, lucideProps(16, "site-settings-close-icon")),
           ),
         ),
         h(
           "div",
           { class: "site-settings-fields" },
-          h(SelectSetting, {
-            id: "site-settings-font-family",
-            label: "Body font",
-            value: DEFAULT_SETTINGS.fontFamily,
-            keyName: "fontFamily",
-            options: [
-              { label: "IBM Plex Serif", value: "ibm-plex-serif" },
-              { label: "Minion Pro (if installed)", value: "minion-pro" },
-              { label: "XCharter", value: "xcharter" },
-              { label: "Times New Roman", value: "times-new-roman" },
-              { label: "System", value: "system" },
-            ],
-          }),
-          h(RangeSetting, {
-            id: "site-settings-font-size",
-            label: "Body text",
-            minimum: 95,
-            maximum: 120,
-            value: DEFAULT_SETTINGS.fontSize,
-            keyName: "fontSize",
-          }),
-          h(SelectSetting, {
-            id: "site-settings-measure",
-            label: "Reading width",
-            value: DEFAULT_SETTINGS.measure,
+          h(TypefaceSetting),
+          h(SizeSetting),
+          h(ChoiceSetting, {
+            label: "Line length",
             keyName: "measure",
             options: [
               { label: "Compact", value: "44rem" },
@@ -146,10 +185,8 @@ export function SiteSettings() {
               { label: "Wide", value: "50rem" },
             ],
           }),
-          h(SelectSetting, {
-            id: "site-settings-line-height",
+          h(ChoiceSetting, {
             label: "Line spacing",
-            value: DEFAULT_SETTINGS.lineHeight,
             keyName: "lineHeight",
             options: [
               { label: "Compact", value: "1.55" },
@@ -157,52 +194,35 @@ export function SiteSettings() {
               { label: "Relaxed", value: "1.78" },
             ],
           }),
-          h(SelectSetting, {
-            id: "site-settings-text-align",
-            label: "Text alignment",
-            value: DEFAULT_SETTINGS.textAlign,
+          h(ChoiceSetting, {
+            label: "Alignment",
             keyName: "textAlign",
             options: [
-              { label: "Left", value: "left" },
-              { label: "Justified", value: "justify" },
+              { label: "Left", value: "left", icon: TextAlignStart },
+              { label: "Justified", value: "justify", icon: TextAlignJustify },
             ],
           }),
-          h(
-            "label",
-            { class: "site-settings-motion" },
-            h(
-              "span",
-              null,
-              h("strong", null, "Reduce motion"),
-              h("small", null, "Minimize interface animation."),
-            ),
-            h("input", {
-              type: "checkbox",
-              "data-settings-key": "reduceMotion",
-            }),
-            h("span", { class: "site-settings-switch", "aria-hidden": "true" }),
-          ),
-          h(
-            "label",
-            { class: "site-settings-motion" },
-            h(
-              "span",
-              null,
-              h("strong", null, "Keyboard shortcuts"),
-              h("small", null, "Press ? on any page to see every shortcut."),
-            ),
-            h("input", {
-              type: "checkbox",
-              "data-settings-key": "keyboardShortcuts",
-            }),
-            h("span", { class: "site-settings-switch", "aria-hidden": "true" }),
-          ),
+        ),
+        h(
+          "div",
+          { class: "site-settings-toggles" },
+          h(ToggleSetting, {
+            keyName: "reduceMotion",
+            label: "Reduce motion",
+            description: "Minimize interface animation.",
+          }),
+          h(ToggleSetting, {
+            keyName: "keyboardShortcuts",
+            label: "Keyboard shortcuts",
+            description: "Press ? on any page to see every shortcut.",
+          }),
         ),
         h(
           "div",
           { class: "site-settings-footer" },
-          h("button", { type: "button", "data-settings-reset": "" }, "Restore defaults"),
           h("span", { class: "site-settings-status", role: "status", "aria-live": "polite" }),
+          h("span", { class: "site-settings-note" }, "Saved in this browser"),
+          h("button", { type: "button", "data-settings-reset": "" }, "Restore defaults"),
         ),
       ),
     )
